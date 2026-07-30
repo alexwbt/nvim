@@ -7,10 +7,10 @@ vim.opt.expandtab = true
 
 vim.opt.list = true
 vim.opt.listchars = {
-  space = '·',
-  tab = '→ ',
-  trail = '•',
-  nbsp = '␣'
+  space = "·",
+  tab = "→ ",
+  trail = "•",
+  nbsp = "␣"
 }
 
 if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
@@ -33,9 +33,24 @@ vim.keymap.set("n", "<M-k>", ":m .-2<CR>==", { desc = "Move line up" })
 vim.keymap.set("v", "<M-j>", ":m '>+1<CR>gv=gv", { desc = "Move block down" })
 vim.keymap.set("v", "<M-k>", ":m '<-2<CR>gv=gv", { desc = "Move block up" })
 
+-- Auto-close quotes and brackets
+-- vim.keymap.set('i', '"', '""<Left>')
+-- vim.keymap.set('i', "'", "''<Left>")
+-- vim.keymap.set('i', '(', '()<Left>')
+-- vim.keymap.set('i', '[', '[]<Left>')
+vim.keymap.set('i', '{', '{}<Left>')
+
+-- Auto-close brackets with newlines
+vim.keymap.set('i', '{<CR>', '{<CR>}<Esc>O')
+vim.keymap.set('i', '{;<CR>', '{<CR>};<Esc>O')
+
+
+vim.api.nvim_create_autocmd("CursorMoved", { command = "set nohlsearch" })
+
 
 require("config.lazy")
 require("config.telescope")
+require("config.oil")
 
 
 vim.cmd([[colorscheme codedark]])

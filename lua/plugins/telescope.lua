@@ -4,7 +4,7 @@ return {
     'nvim-telescope/telescope.nvim', version = '*',
     dependencies = {
       'nvim-lua/plenary.nvim',
-      -- optional but recommended
+      'jvgrootveld/telescope-zoxide',
       { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
     }
   }
