@@ -33,19 +33,20 @@ vim.keymap.set("n", "<M-k>", ":m .-2<CR>==", { desc = "Move line up" })
 vim.keymap.set("v", "<M-j>", ":m '>+1<CR>gv=gv", { desc = "Move block down" })
 vim.keymap.set("v", "<M-k>", ":m '<-2<CR>gv=gv", { desc = "Move block up" })
 
--- Auto-close quotes and brackets
--- vim.keymap.set('i', '"', '""<Left>')
--- vim.keymap.set('i', "'", "''<Left>")
--- vim.keymap.set('i', '(', '()<Left>')
--- vim.keymap.set('i', '[', '[]<Left>')
-vim.keymap.set('i', '{', '{}<Left>')
-
 -- Auto-close brackets with newlines
 vim.keymap.set('i', '{<CR>', '{<CR>}<Esc>O')
 vim.keymap.set('i', '{;<CR>', '{<CR>};<Esc>O')
 
+-- :noh
+vim.keymap.set("n", "<Esc>", ":noh<CR>");
 
-vim.api.nvim_create_autocmd("CursorMoved", { command = "set nohlsearch" })
+
+-- LSP
+vim.lsp.config("clangd", {
+  cmd = { "clangd" },
+  root_markers = { ".clangd" },
+})
+vim.lsp.enable("clangd")
 
 
 require("config.lazy")
