@@ -53,6 +53,7 @@ end
 require("config.lazy")
 require("config.telescope")
 require("config.oil")
+require("config.neotree")
 
 
 vim.cmd([[colorscheme codedark]])
