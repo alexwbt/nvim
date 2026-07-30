@@ -4,7 +4,6 @@ vim.opt.relativenumber = true
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
-
 vim.opt.list = true
 vim.opt.listchars = {
   space = "·",
@@ -12,6 +11,7 @@ vim.opt.listchars = {
   trail = "•",
   nbsp = "␣"
 }
+vim.opt.display:append("lastline")
 
 if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
   vim.opt.shell = "bash"
@@ -40,13 +40,14 @@ vim.keymap.set('i', '{;<CR>', '{<CR>};<Esc>O')
 -- :noh
 vim.keymap.set("n", "<Esc>", ":noh<CR>");
 
-
--- LSP
-vim.lsp.config("clangd", {
-  cmd = { "clangd" },
-  root_markers = { ".clangd" },
-})
-vim.lsp.enable("clangd")
+-- clangd
+if vim.fn.filereadable(vim.fn.getcwd() .. '/.clangd') == 1 then
+  vim.lsp.config("clangd", {
+    cmd = { "clangd" },
+    filetypes = { "c", "cpp", "h", "hpp" },
+  })
+  vim.lsp.enable("clangd")
+end
 
 
 require("config.lazy")
