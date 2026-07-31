@@ -40,14 +40,13 @@ vim.keymap.set('i', '{;<CR>', '{<CR>};<Esc>O')
 -- :noh
 vim.keymap.set("n", "<Esc>", ":noh<CR>");
 
--- clangd
-if vim.fn.filereadable(vim.fn.getcwd() .. '/.clangd') == 1 then
-  vim.lsp.config("clangd", {
-    cmd = { "clangd" },
-    filetypes = { "c", "cpp", "h", "hpp" },
-  })
-  vim.lsp.enable("clangd")
-end
+-- LSP
+vim.lsp.config("clangd", {
+  cmd = { "clangd" },
+  filetypes = { "c", "cpp", "h", "hpp" },
+  root_markers = { '.git', '.clangd' },
+})
+vim.lsp.enable("clangd")
 
 
 require("config.lazy")
@@ -57,4 +56,3 @@ require("config.neotree")
 
 
 vim.cmd([[colorscheme codedark]])
-
