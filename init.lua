@@ -11,7 +11,6 @@ vim.opt.listchars = {
   trail = "•",
   nbsp = "␣"
 }
-vim.opt.display:append("lastline")
 
 if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
   vim.opt.shell = "bash"
