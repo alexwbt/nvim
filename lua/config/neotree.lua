@@ -1,5 +1,5 @@
 
-vim.keymap.set("n", "<C-b>", "<cmd>Neotree toggle<cr>")
+vim.keymap.set("n", "<leader>e", "<Cmd>Neotree<CR>")
 
 local neotree = require("neo-tree")
 
