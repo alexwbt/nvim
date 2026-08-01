@@ -49,11 +49,20 @@ vim.lsp.config("clangd", {
 vim.lsp.enable("clangd")
 
 
+vim.filetype.add({
+  extension = {
+    vs = "glsl",
+    fs = "glsl",
+  }
+})
+
+
 require("config.lazy")
 require("config.telescope")
 require("config.oil")
 require("config.neotree")
 require("config.multicursor")
+require("config.treesitter")
 
 
 vim.cmd([[colorscheme codedark]])
