@@ -9,6 +9,11 @@ neotree.setup({
       ["Z"] = "expand_all_nodes",
       ["W"] = "close_all_nodes",
     }
+  },
+  filesystem = {
+    filtered_items = {
+      visible = true,
+    }
   }
 })
 

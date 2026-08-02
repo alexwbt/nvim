@@ -62,6 +62,7 @@ require("config.oil")
 require("config.neotree")
 require("config.multicursor")
 require("config.treesitter")
+require("config.confirm")
 
 
 vim.cmd([[colorscheme codedark]])
