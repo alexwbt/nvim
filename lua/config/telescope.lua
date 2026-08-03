@@ -19,6 +19,14 @@ telescope.setup({
       "_bin",
       "_external",
     },
+    layout_config = {
+      width = 0.99,
+      height = 0.99,
+      preview_width = 0.4,
+    },
+    preview = {
+      wrap = false,
+    },
   }
 })
 
