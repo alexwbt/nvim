@@ -22,21 +22,13 @@ end
 
 
 vim.g.mapleader = " "
-vim.keymap.set("n", "<C-k>", "10k")
-vim.keymap.set("n", "<C-j>", "10j")
-vim.keymap.set("v", "<C-k>", "10k")
-vim.keymap.set("v", "<C-j>", "10j")
 
 vim.keymap.set("n", "<M-j>", ":m .+1<CR>==", { desc = "Move line down" })
 vim.keymap.set("n", "<M-k>", ":m .-2<CR>==", { desc = "Move line up" })
 vim.keymap.set("v", "<M-j>", ":m '>+1<CR>gv=gv", { desc = "Move block down" })
 vim.keymap.set("v", "<M-k>", ":m '<-2<CR>gv=gv", { desc = "Move block up" })
-
--- Auto-close brackets with newlines
 vim.keymap.set('i', '{<CR>', '{<CR>}<Esc>O')
 vim.keymap.set('i', '{;<CR>', '{<CR>};<Esc>O')
-
--- :noh
 vim.keymap.set("n", "<Esc>", ":noh<CR>");
 
 -- LSP
