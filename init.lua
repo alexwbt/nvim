@@ -55,8 +55,8 @@ require("config.neotree")
 require("config.multicursor")
 require("config.treesitter")
 require("config.conform")
+require("config.cmp")
 
 
-vim.cmd([[colorscheme codedark]])
-
+vim.cmd([[colorscheme vscode]])
 vim.cmd([[set fillchars+=vert:\ ]])
