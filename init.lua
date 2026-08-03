@@ -9,7 +9,7 @@ vim.opt.listchars = {
   space = "·",
   tab = "→ ",
   trail = "•",
-  nbsp = "␣"
+  nbsp = "␣",
 }
 
 if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
@@ -58,3 +58,5 @@ require("config.conform")
 
 
 vim.cmd([[colorscheme codedark]])
+
+vim.cmd([[set fillchars+=vert:\ ]])
