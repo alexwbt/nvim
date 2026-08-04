@@ -79,5 +79,5 @@ require("config.conform")
 require("config.cmp")
 
 
-vim.cmd([[colorscheme vscode]])
+vim.cmd([[colorscheme kanagawa-dragon]])
 vim.cmd([[set fillchars+=vert:\ ]])

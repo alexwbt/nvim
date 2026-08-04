@@ -1,11 +1,8 @@
 
 return {
-  {
-    "mofiqul/vscode.nvim",
-    lazy = false,
-    priority = 1000,
-  },
-  { "olimorris/onedarkpro.nvim", },
-  { "sainnhe/everforest", },
-  { "projekt0n/github-nvim-theme", },
+  { "mofiqul/vscode.nvim" },
+  { "olimorris/onedarkpro.nvim" },
+  { "sainnhe/everforest" },
+  { "projekt0n/github-nvim-theme" },
+  { "rebelot/kanagawa.nvim" },
 }
