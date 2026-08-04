@@ -72,6 +72,7 @@ require("config.treesitter")
 require("config.conform")
 require("config.cmp")
 require("config.jdtls")
+require("config.gitsigns")
 
 
 vim.cmd([[colorscheme kanagawa-dragon]])
