@@ -62,6 +62,8 @@ vim.lsp.config("ts_ls", {
 })
 vim.lsp.enable("ts_ls")
 
+vim.keymap.set("n", "<F2>", vim.lsp.buf.rename)
+
 
 require("config.lazy")
 require("config.telescope")
