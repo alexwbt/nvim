@@ -5,7 +5,7 @@ Neovim configuration repo (Windows + MSYS2). Managed by [lazy.nvim](https://gith
 ## Entry point
 
 - `init.lua` is the Neovim entrypoint. It sets options, keymaps, filetypes, LSP, then `require`s configs in this fixed order:
-  - `config.lazy` → `config.telescope` → `config.oil` → `config.neotree` → `config.multicursor` → `config.treesitter` → `config.conform` → `config.cmp`
+  - `config.lazy` → `config.telescope` → `config.oil` → `config.neotree` → `config.multicursor` → `config.treesitter` → `config.conform` → `config.cmp` → `config.jdtls`
   - Finally: `colorscheme vscode` (`mofiqul/vscode.nvim`).
 - Do not change the order. `lazy` must run first; it bootstraps the plugin manager and auto-imports everything under `lua/plugins/`.
 

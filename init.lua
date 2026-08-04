@@ -62,13 +62,6 @@ vim.lsp.config("ts_ls", {
 })
 vim.lsp.enable("ts_ls")
 
-vim.lsp.config("jdtls", {
-  cmd = { "jdtls" },
-  filetypes = { "java" },
-  root_markers = { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" },
-})
-vim.lsp.enable("jdtls")
-
 
 require("config.lazy")
 require("config.telescope")
@@ -78,6 +71,7 @@ require("config.multicursor")
 require("config.treesitter")
 require("config.conform")
 require("config.cmp")
+require("config.jdtls")
 
 
 vim.cmd([[colorscheme kanagawa-dragon]])
