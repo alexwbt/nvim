@@ -140,6 +140,10 @@ local function setup()
   end
   vim.list_extend(cmd, { "-jar", launcher, "-data", data_dir() })
 
+  -- Track whether we've already triggered a post-import rebuild for this
+  -- client (jdtls can emit ServiceReady more than once).
+  local rebuilt = {}
+
   -- jdtls bundles APT support (org.eclipse.jdt.apt.core, org.eclipse.m2e.apt.core)
   -- so MapStruct's annotation processor runs automatically once the project's
   -- pom.xml/build.gradle declares the annotationProcessorPath.
@@ -154,10 +158,45 @@ local function setup()
         },
       },
     },
+    -- jdtls publishes diagnostics for the whole workspace during import using
+    -- a partially-resolved classpath, so unopened files show stale false
+    -- positives. Trigger a full workspace rebuild once the project import
+    -- finishes (language/status type=ServiceReady) so every compilation unit
+    -- is recompiled with the final classpath and stale diagnostics clear.
+    handlers = {
+      ["language/status"] = function(_, result, ctx)
+        if not result or result.type ~= "ServiceReady" or ctx.client_id == nil then return end
+        if rebuilt[ctx.client_id] then return end
+        rebuilt[ctx.client_id] = true
+        local client = vim.lsp.get_client_by_id(ctx.client_id)
+        if not client then return end
+        -- `identifier` = project name to build; vim.NIL => build all projects.
+        client:request("java/buildWorkspace", { identifier = vim.NIL }, function(err, res)
+          if err then
+            vim.notify("jdtls: workspace rebuild failed: " .. tostring(err.message), vim.log.levels.WARN)
+          elseif res then
+            vim.notify("jdtls: workspace rebuilt (" .. tostring(res) .. ")", vim.log.levels.INFO)
+          end
+        end)
+      end,
+    },
   })
   vim.lsp.enable("jdtls")
   configured = true
 end
+
+-- Wipe jdtls's per-project workspace cache when it goes stale (corrupted
+-- indexes, changed JDK/maven coords, mysterious persistent errors).
+-- Run `:JdtlsCleanWorkspace` then restart Neovim.
+vim.api.nvim_create_user_command("JdtlsCleanWorkspace", function()
+  local dir = data_dir()
+  if vim.uv.fs_stat(dir) then
+    vim.fn.delete(dir, "rf")
+    vim.notify("jdtls: removed workspace cache " .. dir, vim.log.levels.INFO)
+  else
+    vim.notify("jdtls: no workspace cache at " .. dir, vim.log.levels.INFO)
+  end
+end, { desc = "Delete jdtls per-project workspace cache" })
 
 -- Defer discovery + enable to the first time a Java buffer is opened. One-shot
 -- autocmd — fires on the first matching FileType, then removes itself.
