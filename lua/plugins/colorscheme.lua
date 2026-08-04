@@ -1,13 +1,11 @@
+
 return {
-  {
-    "ellisonleao/gruvbox.nvim",
-  },
   {
     "mofiqul/vscode.nvim",
     lazy = false,
     priority = 1000,
-    config = function()
-      require("vscode").setup({})
-    end,
   },
+  { "olimorris/onedarkpro.nvim", },
+  { "sainnhe/everforest", },
+  { "projekt0n/github-nvim-theme", },
 }
