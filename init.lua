@@ -35,21 +35,38 @@ vim.keymap.set('i', '{<CR>', '{<CR>}<Esc>O')
 vim.keymap.set('i', '{;<CR>', '{<CR>};<Esc>O')
 vim.keymap.set("n", "<Esc>", ":noh<CR>");
 
--- LSP
-vim.lsp.config("clangd", {
-  cmd = { "clangd" },
-  filetypes = { "c", "cpp", "h", "hpp" },
-  root_markers = { '.git', '.clangd' },
-})
-vim.lsp.enable("clangd")
-
 
 vim.filetype.add({
   extension = {
+    h = "cpp",
+    hpp = "cpp",
     vs = "glsl",
     fs = "glsl",
   }
 })
+
+
+-- LSP
+vim.lsp.config("clangd", {
+  cmd = { "clangd" },
+  filetypes = { "c", "cpp" },
+  root_markers = { '.git', '.clangd' },
+})
+vim.lsp.enable("clangd")
+
+vim.lsp.config("ts_ls", {
+  cmd = { "typescript-language-server", "--stdio" },
+  filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+  root_markers = { "tsconfig.json", "jsconfig.json", "package.json", ".git" },
+})
+vim.lsp.enable("ts_ls")
+
+vim.lsp.config("jdtls", {
+  cmd = { "jdtls" },
+  filetypes = { "java" },
+  root_markers = { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" },
+})
+vim.lsp.enable("jdtls")
 
 
 require("config.lazy")
