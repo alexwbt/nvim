@@ -1,5 +1,4 @@
 -- Visual Studio 2022 (dark) C++ palette, hand-rolled.
--- Loaded via `:colorscheme vs-cpp`. No plugin dependency.
 
 local M = {}
 
