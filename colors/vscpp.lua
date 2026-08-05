@@ -270,6 +270,8 @@ function M.load()
   hl("cType",          { fg = C.keyword })
   hl("cppType",        { fg = C.keyword })
   hl("cppModifier",    { fg = C.keyword })
+  hl("cStructure",     { fg = C.keyword })
+  hl("cppStructure",   { fg = C.keyword })
   hl("cStatement",     { fg = C.control })
 
   -- LSP UI highlights.
