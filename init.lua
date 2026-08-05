@@ -77,5 +77,5 @@ require("config.jdtls")
 require("config.gitsigns")
 
 
-vim.cmd([[colorscheme kanagawa-dragon]])
+vim.cmd([[colorscheme vscpp]])
 vim.cmd([[set fillchars+=vert:\ ]])
