@@ -1,4 +1,6 @@
 
+vim.opt.spell = true
+vim.opt.spelllang = "en"
 vim.opt.wrap = false
 vim.opt.number = true
 vim.opt.relativenumber = true
@@ -75,6 +77,7 @@ require("config.conform")
 require("config.cmp")
 require("config.jdtls")
 require("config.gitsigns")
+require("config.spell")
 
 
 vim.cmd([[colorscheme kanagawa-dragon]])
