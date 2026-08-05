@@ -1,7 +1,4 @@
 
 return {
-  {
-    "stevearc/conform.nvim",
-    opts = {},
-  }
+  { "stevearc/conform.nvim" }
 }

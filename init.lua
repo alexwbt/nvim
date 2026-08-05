@@ -79,3 +79,18 @@ require("config.gitsigns")
 
 vim.cmd([[colorscheme kanagawa-dragon]])
 vim.cmd([[set fillchars+=vert:\ ]])
+
+-- cpp defaults
+local function has_cpp_root()
+  local cwd = vim.fn.getcwd()
+  for _, marker in ipairs({ "CMakeLists.txt", ".clangd", ".clang-format", ".clang-tidy" }) do
+    if vim.fn.filereadable(cwd .. "/" .. marker) == 1 then
+      return true
+    end
+  end
+  return false
+end
+
+if has_cpp_root() then
+  vim.cmd("colorscheme vscpp")
+end

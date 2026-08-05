@@ -8,6 +8,7 @@ vim.keymap.set("n", "<leader>fd", builtin.lsp_definitions, { desc = "Telescope L
 vim.keymap.set("n", "<leader>fi", builtin.lsp_implementations, { desc = "Telescope LSP implementations" })
 vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Telescope buffers" })
 vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Telescope help tags" })
+vim.keymap.set("n", "<leader>fc", builtin.colorscheme)
 
 
 local telescope = require("telescope")
@@ -30,12 +31,12 @@ telescope.setup({
     preview = {
       wrap = false,
     },
-    pickers = {
-      colorscheme = {
-        enable_preview = true,
-      },
+  },
+  pickers = {
+    colorscheme = {
+      enable_preview = true,
     },
-  }
+  },
 })
 
 telescope.load_extension("zoxide")
