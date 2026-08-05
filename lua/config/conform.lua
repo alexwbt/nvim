@@ -1,6 +1,7 @@
 
 require("conform").setup({
   formatters_by_ft = {
+    -- prettier
     javascript = { "prettier" },
     typescript = { "prettier" },
     javascriptreact = { "prettier" },
@@ -12,6 +13,10 @@ require("conform").setup({
     scss = { "prettier" },
     yaml = { "prettier" },
     markdown = { "prettier" },
+    -- shfmt
+    sh = { "shfmt" },
+    bash = { "shfmt" },
+    zsh = { "shfmt" },
   },
 })
 
