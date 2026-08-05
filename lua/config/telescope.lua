@@ -30,6 +30,11 @@ telescope.setup({
     preview = {
       wrap = false,
     },
+    pickers = {
+      colorscheme = {
+        enable_preview = true,
+      },
+    },
   }
 })
 
