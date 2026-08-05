@@ -33,6 +33,12 @@ telescope.setup({
     },
   },
   pickers = {
+    find_files = {
+      hidden = true,
+    },
+    live_grep = {
+      hidden = true,
+    },
     colorscheme = {
       enable_preview = true,
     },
