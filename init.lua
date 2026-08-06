@@ -65,6 +65,7 @@ vim.lsp.config("ts_ls", {
 vim.lsp.enable("ts_ls")
 
 vim.keymap.set("n", "<F2>", vim.lsp.buf.rename)
+vim.api.nvim_create_user_command("LspLog", function() vim.cmd.edit(vim.lsp.get_log_path()) end, {})
 
 
 require("config.lazy")
