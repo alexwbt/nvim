@@ -29,24 +29,8 @@ if root then
 end
 
 vim.api.nvim_create_user_command("SpellAllGood", function()
-  local saved = vim.fn.winsaveview()
-  local ws = vim.wo.wrapscan
-  vim.wo.wrapscan = false
-  vim.cmd("normal! gg")
-  local count, seen = 0, {}
-  while true do
-    local before = vim.fn.getpos(".")
-    vim.cmd("normal! ]s")
-    local after = vim.fn.getpos(".")
-    if before[2] == after[2] and before[3] == after[3] then break end
-    local word, type = unpack(vim.fn.spellbadword())
-    if type == "bad" and not seen[word] then
-      seen[word] = true
-      vim.cmd("normal! zg")
-      count = count + 1
-    end
+  vim.cmd('normal! gg')
+  for _ = 1, 99 do
+    vim.cmd('normal! ]szg')
   end
-  vim.wo.wrapscan = ws
-  vim.fn.winrestview(saved)
-  vim.notify(("Added %d words to spellfile"):format(count))
 end, {})
