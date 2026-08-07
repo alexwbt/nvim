@@ -36,7 +36,7 @@ vim.keymap.set("v", "<M-j>", ":m '>+1<CR>gv=gv", { desc = "Move block down" })
 vim.keymap.set("v", "<M-k>", ":m '<-2<CR>gv=gv", { desc = "Move block up" })
 vim.keymap.set('i', '{<CR>', '{<CR>}<Esc>O')
 vim.keymap.set('i', '{;<CR>', '{<CR>};<Esc>O')
-vim.keymap.set("n", "<Esc>", ":noh<CR>");
+vim.keymap.set("n", "<Esc>", ":noh<CR>")
 
 
 vim.filetype.add({
@@ -49,25 +49,6 @@ vim.filetype.add({
 })
 
 
--- LSP
-vim.lsp.config("clangd", {
-  cmd = { "clangd" },
-  filetypes = { "c", "cpp" },
-  root_markers = { '.git', '.clangd' },
-})
-vim.lsp.enable("clangd")
-
-vim.lsp.config("ts_ls", {
-  cmd = { jit.os == "Windows" and "typescript-language-server.cmd" or "typescript-language-server", "--stdio" },
-  filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
-  root_markers = { "tsconfig.json", "jsconfig.json", "package.json", ".git" },
-})
-vim.lsp.enable("ts_ls")
-
-vim.keymap.set("n", "<F2>", vim.lsp.buf.rename)
-vim.api.nvim_create_user_command("LspLog", function() vim.cmd.edit(vim.lsp.get_log_path()) end, {})
-
-
 require("config.lazy")
 require("config.telescope")
 require("config.oil")
@@ -76,9 +57,17 @@ require("config.multicursor")
 require("config.treesitter")
 require("config.conform")
 require("config.cmp")
-require("config.jdtls")
 require("config.gitsigns")
 require("config.spell")
+
+
+-- LSP
+require("config.lsp.clangd")
+require("config.lsp.jdtls")
+require("config.lsp.lua")
+require("config.lsp.typescript")
+vim.keymap.set("n", "<F2>", vim.lsp.buf.rename)
+vim.api.nvim_create_user_command("LspLog", function() vim.cmd.edit(vim.lsp.get_log_path()) end, {})
 
 
 vim.cmd([[colorscheme kanagawa-dragon]])
