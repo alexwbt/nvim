@@ -1,4 +1,3 @@
-
 vim.opt.spell = true
 vim.opt.spelllang = "en"
 vim.opt.wrap = false
@@ -61,7 +60,10 @@ require("config.gitsigns")
 require("config.spell")
 
 
+--
 -- LSP
+--
+
 require("config.lsp.clangd")
 require("config.lsp.jdtls")
 require("config.lsp.lua")
@@ -73,7 +75,11 @@ vim.api.nvim_create_user_command("LspLog", function() vim.cmd.edit(vim.lsp.get_l
 vim.cmd([[colorscheme kanagawa-dragon]])
 vim.cmd([[set fillchars+=vert:\ ]])
 
--- cpp defaults
+
+--
+-- Project Type Based Defaults
+--
+
 local function has_cpp_root()
   local cwd = vim.fn.getcwd()
   for _, marker in ipairs({ "CMakeLists.txt", ".clangd", ".clang-format", ".clang-tidy" }) do
@@ -84,6 +90,18 @@ local function has_cpp_root()
   return false
 end
 
+local function has_js_root()
+  local cwd = vim.fn.getcwd()
+  for _, marker in ipairs({ "package.json", "tsconfig.json", "jsconfig.json", "node_modules", "yarn.lock", "pnpm-lock.yaml", "package-lock.json", "bun.lockb", ".nvmrc" }) do
+    if vim.fn.filereadable(cwd .. "/" .. marker) == 1 or vim.fn.isdirectory(cwd .. "/" .. marker) == 1 then
+      return true
+    end
+  end
+  return false
+end
+
 if has_cpp_root() then
   vim.cmd("colorscheme vscpp")
+elseif has_js_root() then
+  vim.cmd("colorscheme vscode")
 end
