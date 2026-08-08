@@ -1,14 +1,17 @@
-# Neovim config (Windows + MSYS2)
+# Neovim config
 
 Neovim configuration managed by [lazy.nvim](https://github.com/folke/lazy.nvim).
-The Windows shell is forced to MSYS2 `bash` (see `init.lua`), so everything
-below must be resolvable on that Unix-like PATH — not on `cmd.exe`/PowerShell.
-
 See `AGENTS.md` for the full architecture / conventions write-up.
+
+## Windows note
+
+On Windows, `init.lua` forces `&shell = "bash"` with Unix-style flags, so every
+external program (`:!`, conform, LSPs) is resolved against the bash PATH, not
+`cmd.exe`/PowerShell. On Linux this is a no-op — the native shell/PATH apply.
 
 ## External dependencies
 
-These must be findable on the MSYS2 PATH at runtime.
+These must be findable on the PATH at runtime.
 
 ### Shell & build toolchain
 
