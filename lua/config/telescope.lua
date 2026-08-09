@@ -19,9 +19,6 @@ telescope.setup({
       "%.git",
       "%.vs",
       "%.idea",
-      "_bin",
-      -- "_build",
-      -- "_external",
     },
     layout_config = {
       width = 0.99,
