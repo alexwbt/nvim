@@ -5,3 +5,13 @@ nvim
 utf
 zg
 cpp
+treesitter
+lsp
+fg
+bg
+clangd
+Neo
+cmp
+multicursor
+gitsigns
+blankline
