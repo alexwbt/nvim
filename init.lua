@@ -36,6 +36,8 @@ vim.keymap.set("v", "<M-k>", ":m '<-2<CR>gv=gv", { desc = "Move block up" })
 vim.keymap.set('i', '{<CR>', '{<CR>}<Esc>O')
 vim.keymap.set('i', '{;<CR>', '{<CR>};<Esc>O')
 vim.keymap.set("n", "<Esc>", ":noh<CR>")
+vim.keymap.set("v", "<Tab>", ">gv")
+vim.keymap.set("v", "<S-Tab>", "<gv")
 
 
 vim.filetype.add({
