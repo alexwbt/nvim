@@ -59,6 +59,7 @@ require("config.treesitter")
 require("config.conform")
 require("config.cmp")
 require("config.gitsigns")
+require("config.dap")
 require("config.spell")
 
 
