@@ -1,5 +1,6 @@
 vim.opt.spell = true
 vim.opt.spelllang = "en"
+vim.opt.spelloptions = "camel,noplainbuffer"
 vim.opt.wrap = false
 vim.opt.number = true
 vim.opt.relativenumber = true
