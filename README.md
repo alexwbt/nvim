@@ -52,6 +52,14 @@ Configured in `lua/config/conform.lua`. Triggered by `<A-F>` in normal mode.
 
 `prettier` implies `node` on PATH.
 
+### Debugger (nvim-dap)
+
+C / C++ only, via the `gdb` adapter (`--interpreter=dap`). See `lua/config/dap.lua`.
+
+| Binary | When                          |
+|--------|-------------------------------|
+| `gdb`  | only when launching a DAP session |
+
 ### Other
 
 | Binary   | Why                                        |

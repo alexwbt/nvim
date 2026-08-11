@@ -7,7 +7,7 @@ Neovim configuration repo (Windows + MSYS2). Managed by [lazy.nvim](https://gith
 `init.lua` is the Neovim entrypoint. It sets options, keymaps, filetypes, then `require`s configs in this fixed order — do not reorder:
 
 1. `config.lazy` (must be first; bootstraps lazy.nvim and auto-imports everything under `lua/plugins/`)
-2. `config.telescope` → `config.oil` → `config.neotree` → `config.multicursor` → `config.treesitter` → `config.conform` → `config.cmp` → `config.gitsigns` → `config.spell`
+2. `config.telescope` → `config.oil` → `config.neotree` → `config.multicursor` → `config.treesitter` → `config.conform` → `config.cmp` → `config.gitsigns` → `config.abolish` → `config.dap` → `config.spell`
 3. LSP configs: `config.lsp.clangd` → `config.lsp.jdtls` → `config.lsp.lua` → `config.lsp.typescript`
 4. Colorscheme (conditional, last — depends on `getcwd()` markers, see below)
 
@@ -79,11 +79,13 @@ Sources: `nvim_lsp`, `buffer`, `path`. `lspkind.nvim` renders the menu (`mode = 
 - `list` is on with custom `listchars` (space `·`, tab `→ `, trail `•`, nbsp `␣`). Don't disable.
 - Custom extension map in `init.lua` via `vim.filetype.add`: `.h`/`.hpp` → `cpp`, `.vs`/`.fs` → `glsl`.
 - Treesitter highlighting is started via a `FileType` autocmd that `pcall(vim.treesitter.start)`s — not via the legacy `ensure_installed`/`highlight` module config. Adding a parser = `:TSInstall <lang>` (parsers build on `:TSUpdate`).
-- Telescope `file_ignore_patterns`: `%.git`, `%.vs`, `%.idea`, `_build`, `_bin`, `_external` — keep this list updated for new large generated dirs. Telescope leader mappings: `<leader>ff` files, `<leader>fo` oldfiles, `<leader>fg` live grep, `<leader>fr` LSP refs, `<leader>fd` LSP defs, `<leader>fi` LSP impls, `<leader>fb` buffers, `<leader>fh` help, `<leader>fc` colorscheme, `<leader>cd` zoxide.
+- Telescope `file_ignore_patterns`: `%.git`, `%.vs`, `%.idea` — keep this list updated for new large generated dirs. Telescope leader mappings: `<leader>ff` files, `<leader>fo` oldfiles, `<leader>fg` live grep, `<leader>fr` LSP refs, `<leader>fd` LSP defs, `<leader>fi` LSP impls, `<leader>fb` buffers, `<leader>fh` help, `<leader>fc` colorscheme, `<leader>cd` zoxide.
 - `<Esc>` in normal mode clears search highlights (`:noh`). Be careful adding other `<Esc>` bindings — they override this.
 - `init.lua` motion keymaps: `<C-j>`/`<C-k>` jump 10 lines (normal + visual); `<M-j>`/`<M-k>` move line/block up/down and reindent. Insert-mode `{<CR>` opens a brace block and positions cursor inside; `{;<CR>` does the same with a trailing `;`.
 - Multicursor: vim-visual-multi with `VM_default_mappings = 1`, `VM_mouse_mappings = 1`; `<M-LeftMouse>` adds a cursor.
 - Oil (file manager) opens on `-`; Neo-tree on `<leader>e`.
+- vim-abolish coercion: `cr<key>` in normal mode (camelCase `c`, MixedCase `m`/`p`, snake_case `s`/`_`, UPPER `u`/`U`, kebab `-`/`k`, dot `.`, space `<space>`, custom Title Case `t`). Visual mode uses `<leader>cr<key>` (not `cr`) to avoid colliding with the `c` change operator. Do **not** set `abolish_no_mappings` — vim-visual-multi special-cases `cr` and replays it across cursors, which needs the default `cr` mapping to exist.
+- DAP (nvim-dap, `lazy = false`): C/C++ only, `gdb` adapter (`--interpreter=dap`). Keys: `<F5>` continue, `<F6>` step over, `<F7>` step into, `<F8>` step out, `<F9>` toggle breakpoint, `<F10>` list breakpoints, `<leader>dr` REPL, `<leader>du` dap-ui toggle. `dapui` auto-opens on init / auto-closes on terminate|exited. `config/dap.lua` `pcall`s its requires, so a missing plugin warns instead of erroring at startup.
 - gitsigns: `current_line_blame` on, shown at end-of-line.
 - Spell: `spell`/`spelllang=en` on globally. A project-local spellfile at `<projectRoot>/.nvim/spell/en.utf-8.add` is prepended to `spellfile` so `zg` writes there (project root detected via `.git`/`.clangd`/`CMakeLists.txt`/`package.json` walking up). `:SpellAllGood` loops `]szg` to accept all spell suggestions. `.nvim/spell/*.spl` is gitignored (compiled spellfiles); the `.add` text files are tracked.
 
