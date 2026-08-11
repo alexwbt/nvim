@@ -3,7 +3,7 @@
 
 local function find_project_root()
   local dir = vim.fn.getcwd()
-  local markers = { ".git", ".clangd", "CMakeLists.txt", "package.json" }
+  local markers = { ".git", ".clangd", "CMakeLists.txt", "package.json", ".nvim" }
   for _ = 1, 20 do
     for _, marker in ipairs(markers) do
       if vim.fn.isdirectory(dir .. "/" .. marker) == 1
