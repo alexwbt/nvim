@@ -25,6 +25,7 @@ vim.keymap.set("n", "<F8>", dap.step_out, { desc = "DAP step out" })
 vim.keymap.set("n", "<F9>", dap.toggle_breakpoint, { desc = "DAP toggle breakpoint" })
 vim.keymap.set("n", "<F10>", dap.restart, { desc = "DAP restart" })
 vim.keymap.set("n", "<S-F5>", dap.terminate, { desc = "DAP terminate" })
+vim.keymap.set("n", "<F17>", dap.terminate, { desc = "DAP terminate" })
 vim.keymap.set("n", "<leader>dr", dap.repl.open, { desc = "DAP REPL" })
 vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "DAP UI" })
 
