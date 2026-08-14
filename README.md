@@ -73,3 +73,14 @@ C / C++ only, via the `gdb` adapter (`--interpreter=dap`). See `lua/config/dap.l
 2. `:Lazy` → wait for installs to finish.
 3. `:TSUpdate` — builds tree-sitter parsers.
 4. `:Lazy build telescope-fzf-native` — runs `make` (needs `gcc` + `make`).
+
+## Keymaps & commands
+
+Leader is space. The full reference lives in `lua/config/*.lua` and `init.lua`.
+
+- `-` — Oil (open parent dir as buffer). `<leader>e` — Neo-tree toggle.
+- `<leader>ff` `<leader>fg` `<leader>fr` `<leader>fd` `<leader>fi` `<leader>fb` `<leader>fh` `<leader>fc` — Telescope (files, live grep, LSP refs/defs/impls, buffers, help, colorscheme). `<leader>cd` — zoxide.
+- `<C-j>` / `<C-k>` — jump 10 lines (normal + visual). `<M-j>` / `<M-k>` — move line/block up/down with reindent.
+- `<A-F>` — format buffer (conform, `lsp_fallback = true`). `<F2>` — LSP rename.
+- `<F5>`/`<F6>`/`<F7>`/`<F8>`/`<F9>`/`<F10>` — DAP continue / step over / step into / step out / toggle breakpoint / restart. `<S-F5>` or `<F17>` — terminate. `<leader>dr` REPL, `<leader>du` dap-ui toggle.
+- `:LspLog` — open the LSP log. `:JdtlsCleanWorkspace` (then restart) — wipe jdtls's per-project cache when Java indexes go stale. `:SpellAllGood` — accept every misspelling suggestion.
