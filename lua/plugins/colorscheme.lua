@@ -1,4 +1,3 @@
-
 return {
   { "mofiqul/vscode.nvim" },
   { "olimorris/onedarkpro.nvim" },

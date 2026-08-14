@@ -15,15 +15,15 @@ These must be findable on the PATH at runtime.
 
 ### Shell & build toolchain
 
-| Binary   | Why                                                          | When              |
-|----------|--------------------------------------------------------------|-------------------|
-| `bash`   | Forced as `&shell` on Windows; runs `:!`, jobs, conform, LSP  | always            |
-| `git`    | lazy.nvim bootstrap + plugin clones                          | install / updates |
-| `gcc`    | `telescope-fzf-native` build; treesitter parser compiles     | install only      |
-| `make`   | `telescope-fzf-native` build (`build = 'make'`)              | install only      |
+| Binary        | Why                                                                       | When              |
+|---------------|---------------------------------------------------------------------------|-------------------|
+| `bash`        | Forced as `&shell` on Windows; runs `:!`, jobs, conform, LSP              | always            |
+| `git`         | lazy.nvim bootstrap + plugin clones                                       | install / updates |
+| `gcc`         | compiler used by `tree-sitter` and `make` builds                          | install only      |
+| `make`        | `telescope-fzf-native` build (`build = 'make'`)                           | install only      |
+| `tree-sitter` | required by `nvim-treesitter`'s `ts.install(...)` to fetch and compile parsers | install only   |
 
-`gcc`/`make` are only needed at install time (`:Lazy build telescope-fzf-native`,
-`:TSUpdate`) — not for normal editing.
+`gcc`/`make`/`tree-sitter` are only needed at install time — not for normal editing.
 
 ### LSP servers
 
@@ -71,7 +71,7 @@ C / C++ only, via the `gdb` adapter (`--interpreter=dap`). See `lua/config/dap.l
 
 1. Launch Neovim — lazy clones itself into `stdpath('data')/lazy/lazy.nvim`.
 2. `:Lazy` → wait for installs to finish.
-3. `:TSUpdate` — builds tree-sitter parsers.
+3. `:TSUpdate` — installs + compiles tree-sitter parsers (requires the `tree-sitter` CLI on PATH).
 4. `:Lazy build telescope-fzf-native` — runs `make` (needs `gcc` + `make`).
 
 ## Keymaps & commands

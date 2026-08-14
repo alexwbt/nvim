@@ -50,7 +50,7 @@ This means `:!cmd`, terminal jobs, conform formatters, and LSP spawns inherit a 
 
 1. Launch Neovim — lazy clones itself into `stdpath('data')/lazy/lazy.nvim` on first run.
 2. `:Lazy` → wait for installs to finish.
-3. `:TSUpdate` — builds tree-sitter parsers (`nvim-treesitter` has `build = ":TSUpdate"`, `lazy = false`).
+3. `:TSUpdate` — installs + compiles tree-sitter parsers via the `tree-sitter` CLI (must be on PATH; `nvim-treesitter` has `build = ":TSUpdate"`, `lazy = false`). Parser set is declared explicitly in `lua/config/treesitter.lua` via `ts.install(...)`.
 4. `:Lazy build telescope-fzf-native` — runs `make`; requires `gcc` and `make` on PATH (MSYS2 `gcc` package). Note: `telescope-fzf-native` is a dependency but is **not** loaded as a Telescope extension in `config/telescope.lua` — only `zoxide` is (`<leader>cd`).
 
 ## LSPs
@@ -78,7 +78,7 @@ Sources: `nvim_lsp`, `buffer`, `path`. `lspkind.nvim` renders the menu (`mode = 
 - Tab/indent defaults: `tabstop=2`, `shiftwidth=2`, `expandtab=true`. Match this for filetype-specific overrides.
 - `list` is on with custom `listchars` (space `·`, tab `→ `, trail `•`, nbsp `␣`). Don't disable.
 - Custom extension map in `init.lua` via `vim.filetype.add`: `.h`/`.hpp` → `cpp`, `.vs`/`.fs` → `glsl`.
-- Treesitter highlighting is started via a `FileType` autocmd that `pcall(vim.treesitter.start)`s — not via the legacy `ensure_installed`/`highlight` module config. Adding a parser = `:TSInstall <lang>` (parsers build on `:TSUpdate`).
+- Treesitter highlighting is started via a `FileType` autocmd that `pcall(vim.treesitter.start)`s — not via the legacy `ensure_installed`/`highlight` module config. The parser list lives explicitly in `lua/config/treesitter.lua` (`ts.install(...)`) and the plugin spec no longer carries `opts.ensure_installed`. Adding a parser = add to that list and run `:TSUpdate` (which shells out to the `tree-sitter` CLI).
 - Telescope `file_ignore_patterns`: `%.git`, `%.vs`, `%.idea` — keep this list updated for new large generated dirs. Telescope leader mappings: `<leader>ff` files, `<leader>fo` oldfiles, `<leader>fg` live grep, `<leader>fr` LSP refs, `<leader>fd` LSP defs, `<leader>fi` LSP impls, `<leader>fb` buffers, `<leader>fh` help, `<leader>fc` colorscheme, `<leader>cd` zoxide.
 - `<Esc>` in normal mode clears search highlights (`:noh`). Be careful adding other `<Esc>` bindings — they override this.
 - `init.lua` motion keymaps: `<C-j>`/`<C-k>` jump 10 lines (normal + visual); `<M-j>`/`<M-k>` move line/block up/down and reindent. Visual-mode `<Tab>`/`<S-Tab>` indent/dedent the selection (`>gv`/`<gv`). Insert-mode `{<CR>` opens a brace block and positions cursor inside; `{;<CR>` does the same with a trailing `;`.
