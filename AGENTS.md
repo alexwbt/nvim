@@ -91,7 +91,7 @@ Sources: `nvim_lsp`, `buffer`, `path`. `lspkind.nvim` renders the menu (`mode = 
 - `nvim-lsp-file-operations` (renames/moves driven by LSP references): `lazy = false`, no opts. `lua/config/lsp_file_operations.lua` calls `require("lsp-file-operations").setup()` with no args.
 - `lualine.nvim` (statusline): `event = "VeryLazy"`, dep `nvim-web-devicons`. `lua/config/lualine.lua` calls `setup({ options = { theme = "auto" } })` so it follows the conditional kanagawa / vscpp / vscode colorscheme.
 - gitsigns: `current_line_blame` on, shown at end-of-line.
-- `config.vim` (per-project state): walks up from cwd for a project root (`.git`/`.clangd`/`CMakeLists.txt`/`package.json`/`.nvim`) and sets up `<projectRoot>/.nvim/` with a `spell/` dir (`en.utf-8.add` prepended to `spellfile` so `zg` writes there), `undofile` + `undodir = <root>/.nvim/undo`, and an auto-generated `.gitignore` (`spell/*.spl`, `undo/*`). `:SpellAllGood` loops `]szg` to accept every misspelling suggestion. `spell`/`spelllang=en` is on globally.
+- `config.vim` (per-project state): walks up from cwd for a project root (`.git`/`.clangd`/`CMakeLists.txt`/`package.json`/`.nvim`) and sets up `<projectRoot>/.nvim/` with a `spell/` dir (`en.utf-8.add` prepended to `spellfile` so `zg` writes there), `undofile` + `undodir = <root>/.nvim/undo`, and an auto-generated `.gitignore` (`spell/*.spl`, `undo/*`). `:SpellAllGood` loops `]szg` to accept every misspelling suggestion. `spell`/`spelllang=en` is on globally. If `<projectRoot>/.nvim/init.lua` exists it is `dofile`d at the end (protected — a broken file warns, never breaks startup); this is the hook for a repo to register its own DAP configs / keymaps / commands without touching the global config.
 
 ## No build / test / lint pipeline
 

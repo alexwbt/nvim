@@ -45,6 +45,20 @@ if root then
   local undodir = nvim_dir .. "/undo"
   vim.opt.undodir = undodir
   vim.fn.mkdir(undodir, "p")
+
+  -- Project-local config: if <root>/.nvim/init.lua exists, load it. This is
+  -- the hook for a specific repo to register DAP configs / keymaps / commands
+  -- without touching the global config. Protected so a broken file warns, never
+  -- breaks startup.
+  local proj_file = nvim_dir .. "/init.lua"
+  if vim.uv.fs_stat(proj_file) then
+    local ok, err = pcall(dofile, proj_file)
+    if not ok then
+      vim.notify(
+        "project config error in " .. proj_file .. ": " .. tostring(err),
+        vim.log.levels.ERROR)
+    end
+  end
 end
 
 vim.api.nvim_create_user_command("SpellAllGood", function()
