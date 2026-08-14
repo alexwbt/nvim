@@ -14,6 +14,9 @@ dapui.setup()
 local ok_vt = pcall(require, "dap-virtual-text")
 if ok_vt then require("dap-virtual-text").setup() end
 
+local widgets = require("dap.ui.widgets")
+local sessions_sidebar = widgets.sidebar(widgets.sessions)
+
 vim.fn.sign_define("DapBreakpoint", { text = "●", texthl = "ErrorMsg", linehl = "", numhl = "" })
 vim.fn.sign_define("DapBreakpointCondition", { text = "◆", texthl = "WarningMsg", linehl = "", numhl = "" })
 vim.fn.sign_define("DapStopped", { text = "▶", texthl = "Search", linehl = "Search", numhl = "Search" })
@@ -28,10 +31,9 @@ vim.keymap.set("n", "<S-F5>", dap.terminate, { desc = "DAP terminate" })
 vim.keymap.set("n", "<F17>", dap.terminate, { desc = "DAP terminate" })
 vim.keymap.set("n", "<leader>dr", dap.repl.open, { desc = "DAP REPL" })
 vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "DAP UI" })
+vim.keymap.set("n", "<leader>ds", sessions_sidebar.toggle, { desc = "DAP sessions sidebar" })
 
 dap.listeners.after.event_initialized["dapui"] = function() dapui.open() end
-dap.listeners.before.event_terminated["dapui"] = function() dapui.close() end
-dap.listeners.before.event_exited["dapui"] = function() dapui.close() end
 
 dap.adapters.gdb = {
   type = "executable",
