@@ -43,6 +43,7 @@ vim.keymap.set('i', '{;<CR>', '{<CR>};<Esc>O')
 vim.keymap.set("n", "<Esc>", ":noh<CR>")
 vim.keymap.set("v", "<Tab>", ">gv")
 vim.keymap.set("v", "<S-Tab>", "<gv")
+vim.keymap.set("n", "<A-z>", "<Cmd>set wrap!<CR>", { desc = "Toggle line wrap" })
 
 
 vim.filetype.add({
