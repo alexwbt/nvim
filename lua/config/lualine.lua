@@ -1,5 +1,6 @@
+
 local function current_time()
-  return os.date("%H:%M:%S")
+  return os.date("%I:%M:%S %p")
 end
 
 require("lualine").setup({
