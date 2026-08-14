@@ -12,5 +12,10 @@ require("mason").setup({
   ensure_installed = {
     "java-debug-adapter",
     "java-test",
+    "clangd",
+    "lua-language-server",
+    "typescript-language-server",
+    "prettier",
+    "shfmt",
   },
 })

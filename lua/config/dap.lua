@@ -47,9 +47,18 @@ dap.configurations.c = {
     type = "gdb",
     request = "launch",
     program = function()
-      return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+      local path = vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+      dap.session()._program = path
+      return path
     end,
-    cwd = "${workspaceFolder}",
+    cwd = function()
+      local path = dap.session() and dap.session()._program
+      if path and path ~= "" then
+        local dir = vim.fn.fnamemodify(path, ":h")
+        if vim.fn.isdirectory(dir) == 1 then return dir end
+      end
+      return vim.fn.getcwd()
+    end,
     stopAtBeginningOfMainSubprogram = false,
   },
 }
