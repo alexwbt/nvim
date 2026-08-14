@@ -1,7 +1,7 @@
 local ts = require("nvim-treesitter")
 
 ts.install({
-  "c", "cpp", "lua", "javascript", "typescript", "tsx",
+  "c", "cpp", "lua", "javascript", "typescript", "tsx", "jsx", "styled",
   "json", "jsonc", "html", "css", "scss", "yaml",
   "markdown", "markdown_inline", "bash", "vim", "vimdoc",
   "regex", "glsl",

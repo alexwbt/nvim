@@ -26,7 +26,7 @@ Neovim configuration repo (Windows + MSYS2). Managed by [lazy.nvim](https://gith
 - C++ root (`CMakeLists.txt`, `.clangd`, `.clang-format`, `.clang-tidy`) → `colorscheme vscpp` (the hand-rolled `colors/vscpp.lua`).
 - JS root (`package.json`, `tsconfig.json`, `jsconfig.json`, `node_modules`, lockfiles, `.nvmrc`) → `colorscheme vscode`.
 
-Because this runs after all plugin configs and reads `getcwd()`, the colorscheme block must stay last. Multiple installed colorschemes are available (vscode, kanagawa, tokyonight, everforest, onedarkpro, monokai-pro, github) — don't assume `<leader>fc` only shows one.
+Because this runs after all plugin configs and reads `getcwd()`, the colorscheme block must stay last. Multiple installed colorschemes are available (vscode, kanagawa, tokyonight, everforest, onedarkpro, monokai-pro, github, gruvbox) — don't assume `<leader>fc` only shows one.
 
 ## Platform: Windows + MSYS2
 

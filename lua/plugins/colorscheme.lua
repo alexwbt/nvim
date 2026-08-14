@@ -19,6 +19,7 @@ return {
   },
   { "projekt0n/github-nvim-theme" },
   { "rebelot/kanagawa.nvim" },
+  { "morhetz/gruvbox" },
   { "folke/tokyonight.nvim" },
   { "loctvl842/monokai-pro.nvim" },
 }
