@@ -33,18 +33,19 @@ plugin (`lua/plugins/jdtls.lua`).
 
 | Binary                            | Languages  | Notes                                                                       |
 |-----------------------------------|------------|-----------------------------------------------------------------------------|
-| `clangd`                          | C / C++    |                                                                             |
-| `lua-language-server`             | Lua       |                                                                             |
-| `typescript-language-server[.cmd]`| JS / TS   | `.cmd` suffix on Windows; see `lua/config/lsp/typescript.lua`              |
+| `clangd`                          | C / C++    | mason-managed (`ensure_installed`)                                          |
+| `lua-language-server`             | Lua        | mason-managed (`ensure_installed`)                                          |
+| `typescript-language-server[.cmd]`| JS / TS   | mason-managed; `.cmd` suffix on Windows; see `lua/config/lsp/typescript.lua` |
 | `java` (>= 21) or `$JAVA_HOME`    | Java       | jdtls launcher (via nvim-jdtls); deferred — only starts on first `.java` file open |
 | jdtls install                      | Java       | `$JDTLS_HOME`, or `jdtls`/`jdtls.bat` shim on PATH, or a probed common dir  |
 | Lombok jar (optional)             | Java       | auto-discovered from Maven/Gradle caches                                     |
 | java-debug `/` java-test bundles | Java | installed via **mason.nvim** (`java-debug-adapter`, `java-test` → `<data>/mason/share`), or manually at `<jdtls-home>/java-debug` + `<jdtls-home>/vscode-java-test`, `stdpath('cache')/java-debug`, or `~/.debug-plugins` — enables Java DAP + JUnit test running |
 
-Missing `clangd`/`lua-language-server`/`typescript-language-server` silently
-no-ops that LSP. Missing `jdtls`/`java` only warns on first `.java` open.
-Without the java-debug/vscode-java-test bundles the Java LSP still works, but
-Java DAP and test running are silently disabled.
+mason auto-installs `clangd`/`lua-language-server`/`typescript-language-server`
+on first launch (via `ensure_installed`); they're then available to nvim only
+(see the mason note below). Missing `jdtls`/`java` only warns on first `.java`
+open. Without the java-debug/vscode-java-test bundles the Java LSP still works,
+but Java DAP and test running are silently disabled.
 
 ### Formatters (conform.nvim)
 
@@ -55,7 +56,8 @@ Configured in `lua/config/conform.lua`. Triggered by `<A-F>` in normal mode.
 | `prettier` | js, ts, jsx, tsx, json, jsonc, html, css, scss, yaml, markdown  |
 | `shfmt`    | sh, bash, zsh                                                    |
 
-`prettier` implies `node` on PATH.
+`prettier` and `shfmt` are mason-managed (`ensure_installed`). `prettier` implies
+`node` on PATH.
 
 ### Debugger (nvim-dap)
 
@@ -74,6 +76,18 @@ tests. See `lua/config/dap.lua`.
 |----------|--------------------------------------------|
 | `node`   | prettier + typescript-language-server      |
 | `zoxide` | `<leader>cd` (telescope-zoxide extension)   |
+
+### mason.nvim
+
+`clangd`, `lua-language-server`, `typescript-language-server`, `prettier`,
+`shfmt`, and the `java-debug-adapter` / `java-test` bundles are installed via
+**mason.nvim** (`ensure_installed` in `lua/config/mason.lua`) into
+`<data>/mason/`. mason prepends `<data>/mason/bin/` to `PATH` only inside
+Neovim-spawned jobs (LSPs, conform, `:!`), so these binaries are available to
+nvim but **not** to a plain bash shell or other editors. To use them outside
+nvim, install the system package (e.g. `pacman -S mingw-w64-x86_64-clangd`)
+instead and remove the entry from `ensure_installed`. `:Mason` lists installed
+packages; `:MasonInstall <pkg>` / `:MasonUpdate` manage them.
 
 ## Post-install
 
