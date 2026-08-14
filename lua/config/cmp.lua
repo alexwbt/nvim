@@ -5,12 +5,12 @@ local lspkind = require("lspkind")
 cmp.setup({
   window = {
     completion = {
-      border = 'rounded',
-      winhighlight = 'Normal:CmpMenuNormal,FloatBorder:CmpMenuBorder',
+      border = "none",
+      winhighlight = "Normal:NormalFloat,FloatBorder:None",
     },
     documentation = {
-      border = 'rounded',
-      winhighlight = 'Normal:CmpMenuNormal,FloatBorder:CmpMenuBorder',
+      border = "none",
+      winhighlight = "Normal:NormalFloat,FloatBorder:None",
     },
   },
   sources = {

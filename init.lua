@@ -1,6 +1,7 @@
 vim.opt.spell = true
 vim.opt.spelllang = "en"
 vim.opt.spelloptions = "camel,noplainbuffer"
+vim.opt.spellcapcheck = ""
 vim.opt.undofile = true
 vim.opt.scrolloff = 15
 vim.opt.sidescrolloff = 15
@@ -66,6 +67,7 @@ require("config.cmp")
 require("config.gitsigns")
 require("config.abolish")
 require("config.dap")
+require("config.lualine")
 require("config.vim")
 
 
@@ -89,28 +91,28 @@ vim.cmd([[set fillchars+=vert:\ ]])
 -- Project Type Based Defaults
 --
 
-local function has_cpp_root()
-  local cwd = vim.fn.getcwd()
-  for _, marker in ipairs({ "CMakeLists.txt", ".clangd", ".clang-format", ".clang-tidy" }) do
-    if vim.fn.filereadable(cwd .. "/" .. marker) == 1 then
-      return true
-    end
-  end
-  return false
-end
-
-local function has_js_root()
-  local cwd = vim.fn.getcwd()
-  for _, marker in ipairs({ "package.json", "tsconfig.json", "jsconfig.json", "node_modules", "yarn.lock", "pnpm-lock.yaml", "package-lock.json", "bun.lockb", ".nvmrc" }) do
-    if vim.fn.filereadable(cwd .. "/" .. marker) == 1 or vim.fn.isdirectory(cwd .. "/" .. marker) == 1 then
-      return true
-    end
-  end
-  return false
-end
-
-if has_cpp_root() then
-  vim.cmd("colorscheme vscpp")
-elseif has_js_root() then
-  vim.cmd("colorscheme vscode")
-end
+-- local function has_cpp_root()
+--   local cwd = vim.fn.getcwd()
+--   for _, marker in ipairs({ "CMakeLists.txt", ".clangd", ".clang-format", ".clang-tidy" }) do
+--     if vim.fn.filereadable(cwd .. "/" .. marker) == 1 then
+--       return true
+--     end
+--   end
+--   return false
+-- end
+--
+-- local function has_js_root()
+--   local cwd = vim.fn.getcwd()
+--   for _, marker in ipairs({ "package.json", "tsconfig.json", "jsconfig.json", "node_modules", "yarn.lock", "pnpm-lock.yaml", "package-lock.json", "bun.lockb", ".nvmrc" }) do
+--     if vim.fn.filereadable(cwd .. "/" .. marker) == 1 or vim.fn.isdirectory(cwd .. "/" .. marker) == 1 then
+--       return true
+--     end
+--   end
+--   return false
+-- end
+--
+-- if has_cpp_root() then
+--   vim.cmd("colorscheme vscpp")
+-- elseif has_js_root() then
+--   vim.cmd("colorscheme vscode")
+-- end

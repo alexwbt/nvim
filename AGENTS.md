@@ -7,7 +7,7 @@ Neovim configuration repo (Windows + MSYS2). Managed by [lazy.nvim](https://gith
 `init.lua` is the Neovim entrypoint. It sets options, keymaps, filetypes, then `require`s configs in this fixed order — do not reorder:
 
 1. `config.lazy` (must be first; bootstraps lazy.nvim and auto-imports everything under `lua/plugins/`)
-2. `config.telescope` → `config.oil` → `config.neotree` → `config.lsp_file_operations` → `config.multicursor` → `config.treesitter` → `config.conform` → `config.cmp` → `config.gitsigns` → `config.abolish` → `config.dap` → `config.vim`
+2. `config.telescope` → `config.oil` → `config.neotree` → `config.lsp_file_operations` → `config.multicursor` → `config.treesitter` → `config.conform` → `config.cmp` → `config.gitsigns` → `config.abolish` → `config.dap` → `config.lualine` → `config.vim`
 3. LSP configs: `config.lsp.clangd` → `config.lsp.jdtls` → `config.lsp.lua` → `config.lsp.typescript`
 4. Colorscheme (conditional, last — depends on `getcwd()` markers, see below)
 
@@ -86,8 +86,8 @@ Sources: `nvim_lsp`, `buffer`, `path`. `lspkind.nvim` renders the menu (`mode = 
 - Oil (file manager) opens on `-`; Neo-tree on `<leader>e`.
 - vim-abolish coercion: `cr<key>` in normal mode (camelCase `c`, MixedCase `m`/`p`, snake_case `s`/`_`, UPPER `u`/`U`, kebab `-`/`k`, dot `.`, space `<space>`, custom Title Case `t`). Visual mode uses `<leader>cr<key>` (not `cr`) to avoid colliding with the `c` change operator. Do **not** set `abolish_no_mappings` — vim-visual-multi special-cases `cr` and replays it across cursors, which needs the default `cr` mapping to exist.
 - DAP (nvim-dap, `lazy = false`): C/C++ only, `gdb` adapter (`--interpreter=dap`). Keys: `<F5>` continue, `<F6>` step over, `<F7>` step into, `<F8>` step out, `<F9>` toggle breakpoint, `<F10>` restart, `<S-F5>`/`<F17>` terminate, `<leader>dr` REPL, `<leader>du` dap-ui toggle. `dapui` auto-opens on init / auto-closes on terminate|exited. `config/dap.lua` `pcall`s its requires, so a missing plugin warns instead of erroring at startup.
-- `fidget.nvim` (LSP progress UI): `event = "LspAttach"`, no config file — just installs the plugin.
 - `nvim-lsp-file-operations` (renames/moves driven by LSP references): `lazy = false`, no opts. `lua/config/lsp_file_operations.lua` calls `require("lsp-file-operations").setup()` with no args.
+- `lualine.nvim` (statusline): `event = "VeryLazy"`, dep `nvim-web-devicons`. `lua/config/lualine.lua` calls `setup({ options = { theme = "auto" } })` so it follows the conditional kanagawa / vscpp / vscode colorscheme.
 - gitsigns: `current_line_blame` on, shown at end-of-line.
 - `config.vim` (per-project state): walks up from cwd for a project root (`.git`/`.clangd`/`CMakeLists.txt`/`package.json`/`.nvim`) and sets up `<projectRoot>/.nvim/` with three things — a `spell/` dir with `en.utf-8.add` prepended to `spellfile` so `zg` writes there; `undofile = true` + `undodir = <root>/.nvim/undo` for persistent undo; and an auto-generated `.gitignore` (`spell/*.spl`, `undo/*`) that ignores generated state but leaves `.add` text files trackable. `:SpellAllGood` loops `]szg` to accept every misspelling suggestion. `spell`/`spelllang=en` is on globally.
 
