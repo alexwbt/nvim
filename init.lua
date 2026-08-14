@@ -92,9 +92,9 @@ vim.cmd([[set fillchars+=vert:\ ]])
 -- Project Type Based Defaults
 --
 
-local function has_cpp_root()
+local function has_root_markers(root_markers)
   local cwd = vim.fn.getcwd()
-  for _, marker in ipairs({ "CMakeLists.txt", ".clangd", ".clang-format", ".clang-tidy" }) do
+  for _, marker in ipairs(root_markers) do
     if vim.fn.filereadable(cwd .. "/" .. marker) == 1 then
       return true
     end
@@ -102,18 +102,33 @@ local function has_cpp_root()
   return false
 end
 
-local function has_js_root()
-  local cwd = vim.fn.getcwd()
-  for _, marker in ipairs({ "package.json", "tsconfig.json", "jsconfig.json", "node_modules", "yarn.lock", "pnpm-lock.yaml", "package-lock.json", "bun.lockb", ".nvmrc" }) do
-    if vim.fn.filereadable(cwd .. "/" .. marker) == 1 or vim.fn.isdirectory(cwd .. "/" .. marker) == 1 then
-      return true
-    end
-  end
-  return false
-end
+local cpp_root_makers = {
+  "CMakeLists.txt",
+  ".clangd",
+  ".clang-format",
+  ".clang-tidy"
+}
+local js_root_markers = {
+  "package.json",
+  "tsconfig.json",
+  "jsconfig.json",
+  "node_modules",
+  "yarn.lock",
+  "pnpm-lock.yaml",
+  "package-lock.json",
+  "bun.lockb",
+  ".nvmrc",
+}
+local java_root_markers = {
+  "pom.xml",
+  "mvnw",
+  "mvnw.cmd",
+}
 
-if has_cpp_root() then
+if has_root_markers(cpp_root_makers) then
   vim.cmd("colorscheme vscpp")
-elseif has_js_root() then
+elseif has_root_markers(js_root_markers) then
   vim.cmd("colorscheme vscode")
+elseif has_root_markers(java_root_markers) then
+  vim.cmd("colorscheme everforest")
 end

@@ -1,6 +1,11 @@
--- Dynamic jdtls (Eclipse Java LSP) configuration.
--- Discovers the jdtls install, a Java >= 21 runtime, and the Lombok agent
--- without hardcoding any machine-specific paths.
+-- nvim-jdtls (Eclipse Java LSP) configuration.
+-- Discovers a jdtls install, a Java >= 21 runtime, and the java-debug /
+-- java-test bundles without hardcoding machine-specific paths, then delegates
+-- startup + DAP to `nvim-jdtls`.
+--
+-- NOTE: the plain `vim.lsp.config("jdtls")` / `vim.lsp.enable` path is NOT
+-- used here — nvim-jdtls owns the client lifecycle and auto-registers the `java`
+-- DAP adapter when nvim-dap is available.
 
 -- Pick the first directory from `candidates` that contains `entry`.
 local function find_dir(candidates, entry)
@@ -18,11 +23,9 @@ local function find_jdtls_home()
   local env = os.getenv("JDTLS_HOME")
   if env and env ~= "" and vim.uv.fs_stat(env .. "/plugins") then return env end
 
-  -- Resolve via the PATH shim (works for both `jdtls` and `jdtls.bat`).
   for _, name in ipairs({ "jdtls", "jdtls.bat" }) do
     local exe = vim.fn.exepath(name)
     if exe ~= "" then
-      -- shim lives in <home>/bin, install root is <home>
       local bin = vim.fs.dirname(exe)
       local home = vim.fs.dirname(bin)
       if vim.uv.fs_stat(home .. "/plugins") then return home end
@@ -96,98 +99,71 @@ local function data_dir()
   return vim.fn.stdpath("cache") .. "/jdtls/workspace/" .. hash
 end
 
-local jdtls_home = find_jdtls_home()
-local java = find_java()
+-- Roots used to define a Java project (matching the previous `root_markers`).
+local ROOT_MARKERS = { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle", "settings.gradle" }
 
--- Build the jdtls launch command. Runs the first time a `.java` file opens,
--- not at startup — keeps `require("config.jdtls")` cheap when no Java is used.
-local configured = false
-local function setup()
-  if configured then return end
-  if not jdtls_home or not java then
-    vim.notify(
-      "jdtls: not configured — "
-        .. (not jdtls_home and "jdtls install not found (set $JDTLS_HOME)" or "")
-        .. (not jdtls_home and not java and "; " or "")
-        .. (not java and "java runtime not found (set $JAVA_HOME)" or ""),
-      vim.log.levels.WARN)
-    configured = true
-    return
-  end
-
-  local plugins = jdtls_home .. "/plugins"
-  local launcher = vim.fn.glob(plugins .. "/org.eclipse.equinox.launcher_*.jar", false, true)[1]
-    or (plugins .. "/org.eclipse.equinox.launcher.jar")
-  local config_dir = jdtls_home .. "/" .. config_subdir()
-  local lombok = find_lombok()
-
-  local cmd = {
-    java,
-    "-Declipse.application=org.eclipse.jdt.ls.core.id1",
-    "-Dosgi.bundles.defaultStartLevel=4",
-    "-Declipse.product=org.eclipse.jdt.ls.core.product",
-    "-Dosgi.checkConfiguration=true",
-    "-Dosgi.sharedConfiguration.area=" .. config_dir,
-    "-Dosgi.sharedConfiguration.area.readOnly=true",
-    "-Dosgi.configuration.cascaded=true",
-    "-Xms1G",
-    "--add-modules=ALL-SYSTEM",
-    "--add-opens", "java.base/java.util=ALL-UNNAMED",
-    "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+-- Find the java-debug bundle jar, optionally alongside the java-test bundles.
+-- Returns `nil` when the debug server isn't installed (debugging + test running
+-- then stay disabled). Searched:
+--   1. <jdtls-home>/java-debug (and <jdtls-home>/vscode-java-test)
+--   2. stdpath('cache')/java-debug (and .../vscode-java-test)
+--   3. ~/.debug-plugins
+--   4. mason-managed: <data>/mason/share/java-debug-adapter (and .../java-test)
+local function find_debug_bundles()
+  local jdtls_home = find_jdtls_home()
+  local home = os.getenv("HOME") or vim.env.HOME or ""
+  local mason = vim.env.MASON or (vim.fn.stdpath("data") .. "/mason")
+  local bases = {
+    jdtls_home and (jdtls_home .. "/java-debug") or nil,
+    jdtls_home and (jdtls_home .. "/vscode-java-test") or nil,
+    vim.fn.stdpath("cache") .. "/java-debug",
+    vim.fn.stdpath("cache") .. "/vscode-java-test",
+    home .. "/.debug-plugins",
+    mason .. "/share/java-debug-adapter",
+    mason .. "/share/java-test",
   }
-  if lombok then
-    table.insert(cmd, 2, "-javaagent:" .. lombok)
+  local bundles = {}
+  local seen = {}
+  local add_dir = function(dir)
+    if not dir or not vim.uv.fs_stat(dir) then return end
+    for _, jar in ipairs(vim.fn.glob(dir .. "/com.microsoft.java.debug.plugin-*.jar", false, true)) do
+      if not seen[jar] then
+        bundles[#bundles + 1] = jar
+        seen[jar] = true
+      end
+    end
+    -- java-test: several jars under `server/` (manual layout) or literally in the
+    -- dir (mason `share/java-test`), excluding the non-bundle test-runner +
+    -- jacoco agent.
+    local excluded = {
+      ["com.microsoft.java.test.runner-jar-with-dependencies.jar"] = true,
+      ["com.microsoft.java.test.runner.jar"] = true,
+      ["jacocoagent.jar"] = true,
+    }
+    local server = dir .. "/server"
+    if vim.uv.fs_stat(server) then
+      for _, jar in ipairs(vim.fn.glob(server .. "/*.jar", false, true)) do
+        local fname = vim.fn.fnamemodify(jar, ":t")
+        if not excluded[fname] and not seen[jar] then
+          bundles[#bundles + 1] = jar
+          seen[jar] = true
+        end
+      end
+    end
+    for _, jar in ipairs(vim.fn.glob(dir .. "/*.jar", false, true)) do
+      local fname = vim.fn.fnamemodify(jar, ":t")
+      if not excluded[fname] and not seen[jar] then
+        bundles[#bundles + 1] = jar
+        seen[jar] = true
+      end
+    end
   end
-  vim.list_extend(cmd, { "-jar", launcher, "-data", data_dir() })
-
-  -- Track whether we've already triggered a post-import rebuild for this
-  -- client (jdtls can emit ServiceReady more than once).
-  local rebuilt = {}
-
-  -- jdtls bundles APT support (org.eclipse.jdt.apt.core, org.eclipse.m2e.apt.core)
-  -- so MapStruct's annotation processor runs automatically once the project's
-  -- pom.xml/build.gradle declares the annotationProcessorPath.
-  vim.lsp.config("jdtls", {
-    cmd = cmd,
-    filetypes = { "java" },
-    root_markers = { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle", "settings.gradle" },
-    settings = {
-      java = {
-        configuration = {
-          maven = { notCoveredPluginExecutionSeverity = "ignore" },
-        },
-      },
-    },
-    -- jdtls publishes diagnostics for the whole workspace during import using
-    -- a partially-resolved classpath, so unopened files show stale false
-    -- positives. Trigger a full workspace rebuild once the project import
-    -- finishes (language/status type=ServiceReady) so every compilation unit
-    -- is recompiled with the final classpath and stale diagnostics clear.
-    handlers = {
-      ["language/status"] = function(_, result, ctx)
-        if not result or result.type ~= "ServiceReady" or ctx.client_id == nil then return end
-        if rebuilt[ctx.client_id] then return end
-        rebuilt[ctx.client_id] = true
-        local client = vim.lsp.get_client_by_id(ctx.client_id)
-        if not client then return end
-        -- `identifier` = project name to build; vim.NIL => build all projects.
-        client:request("java/buildWorkspace", { identifier = vim.NIL }, function(err, res)
-          if err then
-            vim.notify("jdtls: workspace rebuild failed: " .. tostring(err.message), vim.log.levels.WARN)
-          elseif res then
-            vim.notify("jdtls: workspace rebuilt (" .. tostring(res) .. ")", vim.log.levels.INFO)
-          end
-        end)
-      end,
-    },
-  })
-  vim.lsp.enable("jdtls")
-  configured = true
+  for _, base in ipairs(bases) do add_dir(base) end
+  if #bundles == 0 then return nil end
+  return bundles
 end
 
--- Wipe jdtls's per-project workspace cache when it goes stale (corrupted
--- indexes, changed JDK/maven coords, mysterious persistent errors).
--- Run `:JdtlsCleanWorkspace` then restart Neovim.
+-- Wipe jdtls's per-project workspace cache when it goes stale.
 vim.api.nvim_create_user_command("JdtlsCleanWorkspace", function()
   local dir = data_dir()
   if vim.uv.fs_stat(dir) then
@@ -198,10 +174,113 @@ vim.api.nvim_create_user_command("JdtlsCleanWorkspace", function()
   end
 end, { desc = "Delete jdtls per-project workspace cache" })
 
--- Defer discovery + enable to the first time a Java buffer is opened. One-shot
--- autocmd — fires on the first matching FileType, then removes itself.
+-- Deferred start: only boot jdtls (and require nvim-jdtls) once a Java buffer
+-- opens. One-shot autocmd — fires on the first matching FileType, then removes
+-- itself. Keeps startup cheap for non-Java work.
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "java",
   once = true,
-  callback = setup,
+  callback = function()
+    local ok, jdtls = pcall(require, "jdtls")
+    if not ok then
+      vim.notify("jdtls: nvim-jdtls not installed — run :Lazy", vim.log.levels.WARN)
+      return
+    end
+
+    local jdtls_home = find_jdtls_home()
+    local java = find_java()
+    if not jdtls_home or not java then
+      vim.notify(
+        "jdtls: not configured — "
+          .. (not jdtls_home and "jdtls install not found (set $JDTLS_HOME)" or "")
+          .. (not jdtls_home and not java and "; " or "")
+          .. (not java and "java runtime not found (set $JAVA_HOME)" or ""),
+        vim.log.levels.WARN)
+      return
+    end
+
+    local plugins = jdtls_home .. "/plugins"
+    local launcher = vim.fn.glob(plugins .. "/org.eclipse.equinox.launcher_*.jar", false, true)[1]
+      or (plugins .. "/org.eclipse.equinox.launcher.jar")
+    local config_dir = jdtls_home .. "/" .. config_subdir()
+    local lombok = find_lombok()
+    -- java-debug (+ java-test) bundles; nil => DAP/test disabled.
+    local bundles = find_debug_bundles()
+
+    local cmd = {
+      java,
+      "-Declipse.application=org.eclipse.jdt.ls.core.id1",
+      "-Dosgi.bundles.defaultStartLevel=4",
+      "-Declipse.product=org.eclipse.jdt.ls.core.product",
+      "-Dosgi.checkConfiguration=true",
+      "-Dosgi.sharedConfiguration.area=" .. config_dir,
+      "-Dosgi.sharedConfiguration.area.readOnly=true",
+      "-Dosgi.configuration.cascaded=true",
+      "-Xms1G",
+      "--add-modules=ALL-SYSTEM",
+      "--add-opens", "java.base/java.util=ALL-UNNAMED",
+      "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+    }
+    if lombok then
+      table.insert(cmd, 2, "-javaagent:" .. lombok)
+    end
+    vim.list_extend(cmd, { "-jar", launcher, "-data", data_dir() })
+
+    local root = vim.fs.root(0, ROOT_MARKERS) or vim.fn.getcwd()
+
+    -- Expose whether the java-debug bundle was found.
+    vim.g.jdtls_debug_bundles = bundles ~= nil
+    -- A minimal F5-able java launch config. nvim-jdtls auto-registers the
+    -- `java` adapter and `:DapNew` discovers main classes / JUnit tests, so
+    -- only the fallback config is added here.
+    if bundles then
+      local ok_dap, dap = pcall(require, "dap")
+      if ok_dap and not dap.configurations.java then
+        dap.configurations.java = {
+          {
+            type = "java",
+            request = "launch",
+            name = "Debug (Attach) - Current File",
+            mainClass = "${workspaceFolder}/unknown",
+            projectName = vim.fs.basename(root),
+          },
+        }
+      end
+    end
+
+    local config = {
+      cmd = cmd,
+      -- java-debug / java-test bundles loaded by jdtls; enables DAP + tests.
+      init_options = {
+        bundles = bundles or vim.empty_dict(),
+      },
+      settings = {
+        java = {
+          configuration = {
+            maven = { notCoveredPluginExecutionSeverity = "ignore" },
+          },
+          -- Build with ./mvnw (which honours the pom's maven.compiler.release,
+          -- here Java 21) instead of jdtls's embedded JDT compiler, which can
+          -- compile to a different (newer) class file version and then fail to load
+          -- on the Java-21 runtime jdtls launches with. Run :Mvn* / ./mvnw yourself.
+          autobuild = { enabled = false },
+          debug = {
+            settings = {
+              forceBuildBeforeLaunch = false,
+              console = "integratedTerminal",
+            },
+          },
+        },
+      },
+      root_dir = root,
+      project_name = vim.fs.basename(root),
+    }
+
+    -- Always register the extra `:Jdt*` commands. nvim-jdtls auto-registers
+    -- the `java` DAP adapter when nvim-dap is present, so only the launch
+    -- config (in config/dap.lua) is missing.
+    if bundles then pcall(jdtls.setup.add_commands) end
+
+    jdtls.start_or_attach(config)
+  end,
 })

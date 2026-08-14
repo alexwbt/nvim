@@ -27,19 +27,24 @@ These must be findable on the PATH at runtime.
 
 ### LSP servers
 
-Configured in `lua/config/lsp/*.lua` via `vim.lsp.config` + `vim.lsp.enable`.
+Configured in `lua/config/lsp/*.lua`. `clangd`, `lua_ls`, `ts_ls` use
+`vim.lsp.config` + `vim.lsp.enable`; `jdtls` is started by the **`nvim-jdtls`**
+plugin (`lua/plugins/jdtls.lua`).
 
 | Binary                            | Languages  | Notes                                                                       |
 |-----------------------------------|------------|-----------------------------------------------------------------------------|
 | `clangd`                          | C / C++    |                                                                             |
 | `lua-language-server`             | Lua       |                                                                             |
 | `typescript-language-server[.cmd]`| JS / TS   | `.cmd` suffix on Windows; see `lua/config/lsp/typescript.lua`              |
-| `java` (>= 21) or `$JAVA_HOME`    | Java       | jdtls launcher; deferred — only starts on first `.java` file open           |
+| `java` (>= 21) or `$JAVA_HOME`    | Java       | jdtls launcher (via nvim-jdtls); deferred — only starts on first `.java` file open |
 | jdtls install                      | Java       | `$JDTLS_HOME`, or `jdtls`/`jdtls.bat` shim on PATH, or a probed common dir  |
 | Lombok jar (optional)             | Java       | auto-discovered from Maven/Gradle caches                                     |
+| java-debug `/` java-test bundles | Java | installed via **mason.nvim** (`java-debug-adapter`, `java-test` → `<data>/mason/share`), or manually at `<jdtls-home>/java-debug` + `<jdtls-home>/vscode-java-test`, `stdpath('cache')/java-debug`, or `~/.debug-plugins` — enables Java DAP + JUnit test running |
 
 Missing `clangd`/`lua-language-server`/`typescript-language-server` silently
 no-ops that LSP. Missing `jdtls`/`java` only warns on first `.java` open.
+Without the java-debug/vscode-java-test bundles the Java LSP still works, but
+Java DAP and test running are silently disabled.
 
 ### Formatters (conform.nvim)
 
@@ -54,11 +59,14 @@ Configured in `lua/config/conform.lua`. Triggered by `<A-F>` in normal mode.
 
 ### Debugger (nvim-dap)
 
-C / C++ only, via the `gdb` adapter (`--interpreter=dap`). See `lua/config/dap.lua`.
+C / C++ via the `gdb` adapter (`--interpreter=dap`). Java via nvim-jdtls's
+auto-registered `java` adapter (requires the java-debug `/` vscode-java-test
+bundles — see the LSP table above); `:DapNew` discovers main classes and JUnit
+tests. See `lua/config/dap.lua`.
 
 | Binary | When                          |
 |--------|-------------------------------|
-| `gdb`  | only when launching a DAP session |
+| `gdb`  | only when launching a C/C++ DAP session |
 
 ### Other
 
@@ -83,4 +91,4 @@ Leader is space. The full reference lives in `lua/config/*.lua` and `init.lua`.
 - `<C-j>` / `<C-k>` — jump 10 lines (normal + visual). `<M-j>` / `<M-k>` — move line/block up/down with reindent.
 - `<A-F>` — format buffer (conform, `lsp_fallback = true`). `<F2>` — LSP rename.
 - `<F5>`/`<F6>`/`<F7>`/`<F8>`/`<F9>`/`<F10>` — DAP continue / step over / step into / step out / toggle breakpoint / restart. `<S-F5>` or `<F17>` — terminate. `<leader>dr` REPL, `<leader>du` dap-ui toggle.
-- `:LspLog` — open the LSP log. `:JdtlsCleanWorkspace` (then restart) — wipe jdtls's per-project cache when Java indexes go stale. `:SpellAllGood` — accept every misspelling suggestion.
+- `:LspLog` — open the LSP log. `:JdtlsCleanWorkspace` (then restart) — wipe jdtls's per-project cache when Java indexes go stale. `:DapNew` (Java) — auto-discover main classes / JUnit tests and debug them. `:SpellAllGood` — accept every misspelling suggestion.
