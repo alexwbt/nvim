@@ -41,6 +41,8 @@ dap.adapters.gdb = {
   args = { "--interpreter=dap" },
 }
 
+local gdb_cwd
+
 dap.configurations.c = {
   {
     name = "Launch (gdb)",
@@ -48,16 +50,12 @@ dap.configurations.c = {
     request = "launch",
     program = function()
       local path = vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
-      dap.session()._program = path
+      local dir = vim.fn.fnamemodify(path, ":h")
+      gdb_cwd = vim.fn.isdirectory(dir) and dir or vim.fn.getcwd()
       return path
     end,
     cwd = function()
-      local path = dap.session() and dap.session()._program
-      if path and path ~= "" then
-        local dir = vim.fn.fnamemodify(path, ":h")
-        if vim.fn.isdirectory(dir) == 1 then return dir end
-      end
-      return vim.fn.getcwd()
+      return gdb_cwd and gdb_cwd or vim.fn.getcwd()
     end,
     stopAtBeginningOfMainSubprogram = false,
   },
