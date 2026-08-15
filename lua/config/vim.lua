@@ -1,4 +1,4 @@
--- Per-project state under <projectRoot>/.nvim/.
+-- Per-project state under <projectRoot>/.nvim/
 --   spell/        spellfile additions (zg writes here)
 --   undo/         persistent undo history
 --   .gitignore    auto-generated; ignores compiled spell + undo
@@ -62,8 +62,8 @@ if root then
 end
 
 vim.api.nvim_create_user_command("SpellAllGood", function()
-  vim.cmd('normal! gg')
+  vim.cmd("normal! gg")
   for _ = 1, 99 do
-    vim.cmd('normal! ]szg')
+    vim.cmd("normal! ]szg")
   end
 end, {})

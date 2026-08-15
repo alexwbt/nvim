@@ -75,7 +75,6 @@ require("config.vim")
 --
 -- LSP
 --
-
 require("config.lsp.clangd")
 require("config.lsp.jdtls")
 require("config.lsp.lua")
