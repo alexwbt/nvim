@@ -9,7 +9,7 @@
 --     the built-in `c` (change) operator in visual mode, so use a leader prefix.
 --
 --   c          camelCase        foo_bar -> fooBar
---   m / p      MixedCase        foo_bar -> FooBar
+--   p / m      PascalCase       foo_bar -> FooBar
 --   s / _      snake_case       fooBar  -> foo_bar
 --   u / U      UPPER_SNAKE      fooBar  -> FOO_BAR
 --   - / k      kebab-case       fooBar  -> foo-bar
