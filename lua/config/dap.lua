@@ -32,6 +32,7 @@ vim.keymap.set("n", "<F17>", dap.terminate, { desc = "DAP terminate" })
 vim.keymap.set("n", "<leader>dr", dap.repl.open, { desc = "DAP REPL" })
 vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "DAP UI" })
 vim.keymap.set("n", "<leader>ds", sessions_sidebar.toggle, { desc = "DAP sessions sidebar" })
+vim.api.nvim_create_user_command("ClearBreakpoints", dap.clear_breakpoints, { desc = "DAP clear breakpoints" })
 
 dap.listeners.after.event_initialized["dapui"] = function() dapui.open() end
 
