@@ -72,6 +72,10 @@ require("config.lualine")
 require("config.vim")
 
 
+vim.cmd([[colorscheme kanagawa-dragon]])
+vim.cmd([[set fillchars+=vert:\ ]])
+
+
 --
 -- LSP
 --
@@ -80,17 +84,14 @@ require("config.lsp.jdtls")
 require("config.lsp.lua")
 require("config.lsp.typescript")
 vim.keymap.set("n", "<F2>", vim.lsp.buf.rename)
-vim.api.nvim_create_user_command("LspLog", function() vim.cmd.edit(vim.lsp.get_log_path()) end, {})
-
-
-vim.cmd([[colorscheme kanagawa-dragon]])
-vim.cmd([[set fillchars+=vert:\ ]])
+vim.api.nvim_create_user_command("LspLog", function()
+  vim.cmd.edit(vim.lsp.get_log_path())
+end, {})
 
 
 --
 -- Project Type Based Defaults
 --
-
 local function has_root_markers(root_markers)
   local cwd = vim.fn.getcwd()
   for _, marker in ipairs(root_markers) do
@@ -123,7 +124,6 @@ local java_root_markers = {
   "mvnw",
   "mvnw.cmd",
 }
-
 if has_root_markers(cpp_root_makers) then
   vim.cmd("colorscheme vscpp")
 elseif has_root_markers(js_root_markers) then

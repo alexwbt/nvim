@@ -57,6 +57,10 @@ dap.configurations.c = {
     cwd = function()
       return gdb_cwd and gdb_cwd or vim.fn.getcwd()
     end,
+    args = function()
+      local args_string = vim.fn.input('Arguments: ')
+      return vim.split(args_string, " +") -- splits by spaces
+    end,
     stopAtBeginningOfMainSubprogram = false,
   },
 }
