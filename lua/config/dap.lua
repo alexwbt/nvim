@@ -41,28 +41,24 @@ dap.adapters.gdb = {
   args = { "--interpreter=dap" },
 }
 
-local gdb_cwd
+local gdb_config = setmetatable({}, {
+  __call = function()
+    local path = vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+    if path == "" then return { program = require("dap").ABORT } end
+    local dir = vim.fn.fnamemodify(path, ":h")
+    local cwd = vim.fn.isdirectory(dir) and dir or vim.fn.getcwd()
+    local args = vim.split(vim.fn.input("Arguments: "), " +")
+    return {
+      name = "Launch (gdb)",
+      type = "gdb",
+      request = "launch",
+      program = path,
+      cwd = cwd,
+      args = args,
+      stopAtBeginningOfMainSubprogram = false,
+    }
+  end,
+})
 
-dap.configurations.c = {
-  {
-    name = "Launch (gdb)",
-    type = "gdb",
-    request = "launch",
-    program = function()
-      local path = vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
-      local dir = vim.fn.fnamemodify(path, ":h")
-      gdb_cwd = vim.fn.isdirectory(dir) and dir or vim.fn.getcwd()
-      return path
-    end,
-    cwd = function()
-      return gdb_cwd and gdb_cwd or vim.fn.getcwd()
-    end,
-    args = function()
-      local args_string = vim.fn.input('Arguments: ')
-      return vim.split(args_string, " +") -- splits by spaces
-    end,
-    stopAtBeginningOfMainSubprogram = false,
-  },
-}
-
+dap.configurations.c = { gdb_config }
 dap.configurations.cpp = dap.configurations.c
