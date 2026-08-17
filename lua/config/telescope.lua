@@ -1,4 +1,3 @@
-
 local builtin = require("telescope.builtin")
 vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Telescope find files" })
 vim.keymap.set("n", "<leader>fo", builtin.oldfiles, { desc = "Telescope find files" })
@@ -19,6 +18,9 @@ telescope.setup({
       "%.git",
       "%.vs",
       "%.idea",
+    },
+    path_display = {
+      "filename_first",
     },
     layout_config = {
       width = 0.99,

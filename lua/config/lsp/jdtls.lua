@@ -228,6 +228,25 @@ vim.api.nvim_create_autocmd("FileType", {
 
     local root = vim.fs.root(0, ROOT_MARKERS) or vim.fn.getcwd()
 
+    -- Formatter settings file (Eclipse XML). Resolved per project, in priority
+    -- order:
+    --   1. vim.g.jdtls_formatter  — set from a repo's .nvim/init.lua (project override)
+    --   2. $JDTLS_FORMATTER env var
+    --   3. <root>/jdt-formatter.xml next to the project root
+    -- Falls back to jdtls defaults (url = vim.NIL).
+    local formatter_uri = (function()
+      local function to_uri(p)
+        if p:match("^file:") then return p end
+        return "file:///" .. p:gsub("\\", "/"):gsub("^/", "")
+      end
+      local g = vim.g.jdtls_formatter
+      if g and g ~= "" then return to_uri(g) end
+      local env = os.getenv("JDTLS_FORMATTER")
+      if env and env ~= "" then return to_uri(env) end
+      local p = root .. "/jdt-formatter.xml"
+      if vim.uv.fs_stat(p) then return to_uri(p) end
+    end)()
+
     -- Expose whether the java-debug bundle was found.
     vim.g.jdtls_debug_bundles = bundles ~= nil
     -- A minimal F5-able java launch config. nvim-jdtls auto-registers the
@@ -258,6 +277,14 @@ vim.api.nvim_create_autocmd("FileType", {
         java = {
           configuration = {
             maven = { notCoveredPluginExecutionSeverity = "ignore" },
+          },
+          format = {
+            settings = {
+              -- Use a per-project Eclipse XML formatter if present, otherwise
+              -- fall back to jdtls defaults. `url` accepts a `file:` URI and is
+              -- the standard jdtls key used by VS Code.
+              url = formatter_uri or vim.NIL,
+            },
           },
           -- Build with ./mvnw (which honours the pom's maven.compiler.release,
           -- here Java 21) instead of jdtls's embedded JDT compiler, which can
