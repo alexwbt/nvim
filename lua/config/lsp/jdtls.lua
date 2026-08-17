@@ -175,11 +175,11 @@ vim.api.nvim_create_user_command("JdtlsCleanWorkspace", function()
 end, { desc = "Delete jdtls per-project workspace cache" })
 
 -- Deferred start: only boot jdtls (and require nvim-jdtls) once a Java buffer
--- opens. One-shot autocmd — fires on the first matching FileType, then removes
--- itself. Keeps startup cheap for non-Java work.
+-- opens. Fires on every `FileType java`; nvim-jdtls's start_or_attach is
+-- idempotent per buffer (skips already-attached buffers, and starts a separate
+-- server when the module/root_dir differs), keeping startup cheap for non-Java work.
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "java",
-  once = true,
   callback = function()
     local ok, jdtls = pcall(require, "jdtls")
     if not ok then

@@ -44,6 +44,8 @@ vim.keymap.set("n", "<Esc>", ":noh<CR>")
 vim.keymap.set("v", "<Tab>", ">gv")
 vim.keymap.set("v", "<S-Tab>", "<gv")
 vim.keymap.set("n", "<A-z>", "<Cmd>set wrap!<CR>", { desc = "Toggle line wrap" })
+vim.keymap.set("n", "<leader>o", "<Cmd>bprevious<CR>", { desc = "Older buffer" })
+vim.keymap.set("n", "<leader>i", "<Cmd>bnext<CR>", { desc = "Newer buffer" })
 
 
 vim.filetype.add({
