@@ -1,3 +1,5 @@
+local jit = require("jit")
+
 -- nvim-jdtls (Eclipse Java LSP) configuration.
 -- Discovers a jdtls install, a Java >= 21 runtime, and the java-debug /
 -- java-test bundles without hardcoding machine-specific paths, then delegates

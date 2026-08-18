@@ -1,3 +1,4 @@
+local jit = require("jit")
 
 vim.lsp.config("ts_ls", {
   cmd = { jit.os == "Windows" and "typescript-language-server.cmd" or "typescript-language-server", "--stdio" },
