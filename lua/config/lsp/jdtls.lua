@@ -249,6 +249,27 @@ vim.api.nvim_create_autocmd("FileType", {
       if vim.uv.fs_stat(p) then return to_uri(p) end
     end)()
 
+    -- JDT compiler preferences file (Eclipse .prefs). Resolved per project, in
+    -- priority order:
+    --   1. vim.g.jdtls_settings  -- set from a repo's .nvim/init.lua (project override)
+    --   2. $JDTLS_SETTINGS env var
+    --   3. <root>/.jdt-settings/org.eclipse.jdt.core.prefs next to the project root
+    -- Falls back to jdtls defaults (url = vim.NIL). A subset of the JDT
+    -- compiler preferences can be set here, e.g.
+    --   org.eclipse.jdt.core.compiler.problem.unusedPrivateMember=warning
+    local settings_uri = (function()
+      local function to_uri(p)
+        if p:match("^file:") then return p end
+        return "file:///" .. p:gsub("\\", "/"):gsub("^/", "")
+      end
+      local g = vim.g.jdtls_settings
+      if g and g ~= "" then return to_uri(g) end
+      local env = os.getenv("JDTLS_SETTINGS")
+      if env and env ~= "" then return to_uri(env) end
+      local p = root .. "/.jdt-settings/org.eclipse.jdt.core.prefs"
+      if vim.uv.fs_stat(p) then return to_uri(p) end
+    end)()
+
     -- Expose whether the java-debug bundle was found.
     vim.g.jdtls_debug_bundles = bundles ~= nil
     -- A minimal F5-able java launch config. nvim-jdtls auto-registers the
@@ -277,6 +298,10 @@ vim.api.nvim_create_autocmd("FileType", {
       },
       settings = {
         java = {
+          -- Compiler preferences (Eclipse .prefs file, `java.settings.url`).
+          settings = {
+            url = settings_uri or vim.NIL,
+          },
           configuration = {
             maven = { notCoveredPluginExecutionSeverity = "ignore" },
           },
