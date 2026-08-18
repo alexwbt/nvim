@@ -4,6 +4,8 @@ require("config.lsp.lua")
 require("config.lsp.typescript")
 
 vim.keymap.set("n", "<F2>", vim.lsp.buf.rename)
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
 local lsp_code_action = function()
   vim.lsp.buf.code_action({
     filter = function(action) return action.disabled == nil end
