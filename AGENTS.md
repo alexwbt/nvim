@@ -66,6 +66,8 @@ Configured in `lua/config/lsp/*.lua` via `vim.lsp.config` + `vim.lsp.enable`, re
 
 Global LSP keymaps: `<F2>` = `vim.lsp.buf.rename`; `:LspLog` opens the LSP log.
 
+`lua/config/lsp/init.lua` also defines `:LspInfo`, which prints an aligned table of the attached clients (`Client | PID | Memory | Buffers | Root`). PID + memory are not read from nvim (0.12's LSP client doesn't expose the server pid) — they're resolved from the OS by matching each server's process. Windows uses `wmic` (`/format:csv`, `ProcessId`/`WorkingSetSize`) and **parses CSV from the trailing end** because CommandLine may contain commas / inconsistent quoting; wrapper shells (`cmd.exe`/`sh.exe`) are skipped so the reported pid is the real server, not the `.cmd` launcher. Linux/macOS use `ps -eo pid=,comm=,rss=` (largest-RSS match). Memory shows MB plus a % of total RAM. Limitations: `wmic` is deprecated on newer Windows and may be absent (then the % is dropped and PID shows `?`); matching is by binary name, so multiple same-named servers aggregate to the largest match.
+
 ## Formatting (conform.nvim)
 
 - `<A-F>` in normal mode formats with `lsp_fallback = true`.
