@@ -94,7 +94,7 @@ packages; `:MasonInstall <pkg>` / `:MasonUpdate` manage them.
 1. Launch Neovim — lazy clones itself into `stdpath('data')/lazy/lazy.nvim`.
 2. `:Lazy` → wait for installs to finish.
 3. `:TSUpdate` — installs + compiles tree-sitter parsers (requires the `tree-sitter` CLI on PATH).
-4. `:Lazy build telescope-fzf-native` — runs `make` (needs `gcc` + `make`).
+4. `:Lazy build telescope-fzf-native` — runs `make` (needs `gcc` + `make`). If find_files/live_grep feel slow and `<data>/lazy/telescope-fzf-native.nvim/build/libfzf.dll` is missing (the MSYS2 build can silently no-op), run `make` by hand inside that plugin directory. Both `fzf` and `zoxide` are loaded as Telescope extensions.
 
 ## Keymaps & commands
 
@@ -102,7 +102,7 @@ Leader is space. The full reference lives in `lua/config/*.lua` and `init.lua`.
 
 - `-` — Oil (open parent dir as buffer). `<leader>e` — Neo-tree toggle.
 - `<leader>ff` `<leader>fg` `<leader>fr` `<leader>fd` `<leader>fi` `<leader>fb` `<leader>fh` `<leader>fc` — Telescope (files, live grep, LSP refs/defs/impls, buffers, help, colorscheme). `<leader>cd` — zoxide.
-- `<C-j>` / `<C-k>` — jump 10 lines (normal + visual). `<M-j>` / `<M-k>` — move line/block up/down with reindent.
-- `<A-F>` — format buffer (conform, `lsp_fallback = true`). `<F2>` — LSP rename.
-- `<F5>`/`<F6>`/`<F7>`/`<F8>`/`<F9>`/`<F10>` — DAP continue / step over / step into / step out / toggle breakpoint / restart. `<S-F5>` or `<F17>` — terminate. `<leader>dr` REPL, `<leader>du` dap-ui toggle.
+- `<C-j>` / `<C-k>` — jump 10 lines (normal + visual). `<M-j>` / `<M-k>` — move line/block up/down with reindent. `<A-z>` — toggle word wrap. `<leader>o` / `<leader>i` — prev / next buffer. `<leader>;` — Snacks dashboard.
+- `<A-F>` — format buffer (conform, `lsp_fallback = true`). `<F2>` — LSP rename. `[d` / `]d` — prev / next diagnostic. `<leader><space>` — LSP code action.
+- `<F5>`/`<F6>`/`<F7>`/`<F8>`/`<F9>`/`<F10>` — DAP continue / step over / step into / step out / toggle breakpoint / restart. `<S-F5>` or `<F17>` — terminate. `<leader>dr` REPL, `<leader>du` dap-ui toggle, `<leader>ds` sessions sidebar. `:ClearBreakpoints`.
 - `:LspLog` — open the LSP log. `:LspLogClear` — truncate the LSP log file. `:LspInfo` — show attached LSP clients as a table (name, pid, memory, buffers, root; resolved from the OS). `:JdtlsCleanWorkspace` (then restart) — wipe jdtls's per-project cache when Java indexes go stale. `:DapNew` (Java) — auto-discover main classes / JUnit tests and debug them. `:SpellAllGood` — accept every misspelling suggestion.

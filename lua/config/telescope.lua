@@ -44,5 +44,6 @@ telescope.setup({
   },
 })
 
+telescope.load_extension("fzf")
 telescope.load_extension("zoxide")
 vim.keymap.set("n", "<leader>cd", telescope.extensions.zoxide.list, { desc = "Zoxide" })

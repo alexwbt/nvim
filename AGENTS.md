@@ -7,14 +7,15 @@ Neovim configuration repo (Windows + MSYS2). Managed by [lazy.nvim](https://gith
 `init.lua` is the Neovim entrypoint. It sets options, keymaps, filetypes, then `require`s configs in this fixed order — do not reorder:
 
 1. `config.lazy` (must be first; bootstraps lazy.nvim and auto-imports everything under `lua/plugins/`)
-2. `config.telescope` → `config.oil` → `config.neotree` → `config.lsp_file_operations` → `config.multicursor` → `config.treesitter` → `config.conform` → `config.cmp` → `config.gitsigns` → `config.abolish` → `config.dap` → `config.lualine` → `config.vim`
-3. LSP configs: `config.lsp.clangd` → `config.lsp.jdtls` → `config.lsp.lua` → `config.lsp.typescript`
-4. Colorscheme (conditional, last — depends on `getcwd()` markers, see below)
+2. `config.telescope` → `config.oil` → `config.neotree` → `config.lsp_file_operations` → `config.multicursor` → `config.treesitter` → `config.conform` → `config.autotag` → `config.cmp` → `config.gitsigns` → `config.abolish` → `config.dap` → `config.lualine` → `config.vim` → `config.lsp.init`
+3. `config.lsp.init` requires the per-server LSP configs internally (clangd → jdtls → lua → typescript). Note: it is required as part of the main chain (step 2), NOT after it.
+4. `config.snacks` is NOT required from `init.lua` — it's the `config =` callback of the snacks plugin spec (`lua/plugins/snacks.lua`, `lazy = false`).
+5. Colorscheme (conditional, last — depends on `getcwd()` markers, see below)
 
 ## Layout
 
 - `lua/config/<name>.lua` — settings, keymaps, plugin `setup()` calls for `<name>`.
-- `lua/config/lsp/<name>.lua` — one file per LSP using `vim.lsp.config` + `vim.lsp.enable`. Added/referenced explicitly from `init.lua` (NOT auto-discovered, NOT in plugin specs). To add an LSP: create `lua/config/lsp/<name>.lua` and add a `require("config.lsp.<name>")` line in `init.lua`.
+- `lua/config/lsp/<name>.lua` — one file per LSP using `vim.lsp.config` + `vim.lsp.enable`. Added/referenced explicitly from `lua/config/lsp/init.lua` (NOT auto-discovered, NOT in plugin specs). To add an LSP: create `lua/config/lsp/<name>.lua` and add a `require("config.lsp.<name>")` line in `lua/config/lsp/init.lua`.
 - `lua/plugins/<name>.lua` — lazy.nvim spec for `<name>` (returned as a table). Adding a plugin usually means creating one file in each of `lua/config/` and `lua/plugins/` with the same stem.
 - `colors/vscpp.lua` — hand-rolled VS 2022 dark C++ colorscheme (not a plugin).
 - `lazy-lock.json` — pinned plugin commits; regenerate via lazy.nvim, do not hand-edit unless intentionally pinning.
@@ -25,6 +26,7 @@ Neovim configuration repo (Windows + MSYS2). Managed by [lazy.nvim](https://gith
 
 - C++ root (`CMakeLists.txt`, `.clangd`, `.clang-format`, `.clang-tidy`) → `colorscheme vscpp` (the hand-rolled `colors/vscpp.lua`).
 - JS root (`package.json`, `tsconfig.json`, `jsconfig.json`, `node_modules`, lockfiles, `.nvmrc`) → `colorscheme vscode`.
+- Java root (`pom.xml`, `mvnw`, `mvnw.cmd`) → `colorscheme everforest` (the default `kanagawa-dragon` is otherwise used).
 
 Because this runs after all plugin configs and reads `getcwd()`, the colorscheme block must stay last. Multiple installed colorschemes are available (vscode, kanagawa, tokyonight, everforest, onedarkpro, monokai-pro, github, gruvbox) — don't assume `<leader>fc` only shows one.
 
@@ -51,11 +53,11 @@ This means `:!cmd`, terminal jobs, conform formatters, and LSP spawns inherit a 
 1. Launch Neovim — lazy clones itself into `stdpath('data')/lazy/lazy.nvim` on first run.
 2. `:Lazy` → wait for installs to finish.
 3. `:TSUpdate` — installs + compiles tree-sitter parsers via the `tree-sitter` CLI (must be on PATH; `nvim-treesitter` has `build = ":TSUpdate"`, `lazy = false`). Parser set is declared explicitly in `lua/config/treesitter.lua` via `ts.install(...)`.
-4. `:Lazy build telescope-fzf-native` — runs `make`; requires `gcc` and `make` on PATH (MSYS2 `gcc` package). Note: `telescope-fzf-native` is a dependency but is **not** loaded as a Telescope extension in `config/telescope.lua` — only `zoxide` is (`<leader>cd`).
+4. `:Lazy build telescope-fzf-native` — runs `make`; requires `gcc` and `make` on PATH (MSYS2 `gcc` package). Auto-build can silently no-op on Windows (the MSYS2 build PATH isn't inherited into lazy's build job), so if `find_files`/`live_grep` feel slow, check `.../telescope-fzf-native.nvim/build/libfzf.dll` exists and run `make` by hand if not. Both `fzf` and `zoxide` are loaded as Telescope extensions in `config/telescope.lua`.
 
 ## LSPs
 
-Configured in `lua/config/lsp/*.lua` via `vim.lsp.config` + `vim.lsp.enable`, required from `init.lua`:
+Configured in `lua/config/lsp/*.lua` via `vim.lsp.config` + `vim.lsp.enable`, required from `config/lsp/init.lua` (which is required from `init.lua`):
 
 - `clangd` — `c`/`cpp`, `root_markers = {'.git','.clangd'}`.
 - `lua_ls` — `lua`, `root_markers = {'.git','.luarc.json'}`, `vim` as a declared global.
@@ -64,7 +66,7 @@ Configured in `lua/config/lsp/*.lua` via `vim.lsp.config` + `vim.lsp.enable`, re
   - **Java DAP + tests require the java-debug / vscode-java-test bundles**. These come from **mason.nvim** (`lua/config/mason.lua` → `ensure_installed = { "java-debug-adapter", "java-test" }`, managed installs under `<data>/mason/share`). `find_debug_bundles()` in `lua/config/lsp/jdtls.lua` resolves them. It also scans `<jdtls-home>/java-debug` + `<jdtls-home>/vscode-java-test`, `stdpath('cache')/java-debug` + `.../vscode-java-test`, and `~/.debug-plugins` for manually-placed jars. When found they're passed via `init_options.bundles`; nvim-jdtls then auto-registers the `java` DAP adapter (needs nvim-dap listed as a dependency — it is) and `:DapNew` auto-discovers main classes / JUnit tests. `config/dap.lua` + the datacanva project config only add launch configs when bundles were found. Missing bundles => LSP still works, DAP/tests silently disabled.
 - `config.mason` (mason.nvim, `lazy = false`): package manager for managed tooling binaries. `ensure_installed` covers: `java-debug-adapter` + `java-test` (the jars nvim-jdtls needs — managed installs under `<data>/mason/share`, discovered by `find_debug_bundles()` in `lua/config/lsp/jdtls.lua`), plus the LSP servers `clangd`, `lua-language-server`, `typescript-language-server` and the conform formatters `prettier`, `shfmt`. mason prepends `<data>/mason/bin/` to `PATH` only within Neovim-spawned jobs (LSPs, conform, `:!`), so mason-managed binaries are invisible to a plain bash shell — they're available only to nvim. LSP servers are NOT wired through mason-lspconfig — this config uses `vim.lsp.config`/`vim.lsp.enable` — so mason is only a source of tooling binaries, not lspconfig plumbing. `:MasonInstall <pkg>` / `:MasonUpdate` manage them.
 
-Global LSP keymaps: `<F2>` = `vim.lsp.buf.rename`; `:LspLog` opens the LSP log; `:LspLogClear` truncates it (restart Neovim if the client holds the file open).
+Global LSP keymaps: `<F2>` = `vim.lsp.buf.rename`, `[d`/`]d` = prev/next diagnostic, `<leader><space>` = LSP code action (normal + visual); `:LspLog` opens the LSP log; `:LspLogClear` truncates it (restart Neovim if the client holds the file open).
 
 `lua/config/lsp/init.lua` also defines `:LspInfo`, which prints an aligned table of the attached clients (`Client | PID | Memory | Buffers | Root`). PID + memory are not read from nvim (0.12's LSP client doesn't expose the server pid) — they're resolved from the OS by matching each server's process. Windows uses `wmic` (`/format:csv`, `ProcessId`/`WorkingSetSize`) and **parses CSV from the trailing end** because CommandLine may contain commas / inconsistent quoting; wrapper shells (`cmd.exe`/`sh.exe`) are skipped so the reported pid is the real server, not the `.cmd` launcher. Linux/macOS use `ps -eo pid=,comm=,rss=` (largest-RSS match). Memory shows MB plus a % of total RAM. Limitations: `wmic` is deprecated on newer Windows and may be absent (then the % is dropped and PID shows `?`); matching is by binary name, so multiple same-named servers aggregate to the largest match.
 
@@ -85,7 +87,8 @@ Sources: `nvim_lsp`, `buffer`, `path`. `lspkind.nvim` renders the menu (`mode = 
 - Treesitter highlighting is started via a `FileType` autocmd that `pcall(vim.treesitter.start)`s — not via the legacy `ensure_installed`/`highlight` module config. The parser list lives explicitly in `lua/config/treesitter.lua` (`ts.install(...)`) and the plugin spec no longer carries `opts.ensure_installed`. Adding a parser = add to that list and run `:TSUpdate` (which shells out to the `tree-sitter` CLI).
 - Telescope `file_ignore_patterns`: `%.git`, `%.vs`, `%.idea` — keep this list updated for new large generated dirs. Telescope leader mappings: `<leader>ff` files, `<leader>fo` oldfiles, `<leader>fg` live grep, `<leader>fr` LSP refs, `<leader>fd` LSP defs, `<leader>fi` LSP impls, `<leader>fb` buffers, `<leader>fh` help, `<leader>fc` colorscheme, `<leader>cd` zoxide.
 - `<Esc>` in normal mode clears search highlights (`:noh`). Be careful adding other `<Esc>` bindings — they override this.
-- `init.lua` motion keymaps: `<C-j>`/`<C-k>` jump 10 lines (normal + visual); `<M-j>`/`<M-k>` move line/block up/down and reindent. Visual-mode `<Tab>`/`<S-Tab>` indent/dedent the selection (`>gv`/`<gv`). Insert-mode `{<CR>` opens a brace block and positions cursor inside; `{;<CR>` does the same with a trailing `;`.
+- `init.lua` keymaps: `<C-j>`/`<C-k>` jump 10 lines (normal + visual); `<M-j>`/`<M-k>` move line/block up/down and reindent; `<A-z>` toggles `wrap`; `<leader>o`/`<leader>i` = prev/next buffer. Visual-mode `<Tab>`/`<S-Tab>` indent/dedent the selection (`>gv`/`<gv`). Insert-mode `{<CR>` opens a brace block and positions cursor inside; `{;<CR>` does the same with a trailing `;`.
+- Snacks.nvim (`lazy = false`, `priority = 1000`): only the **dashboard** is configured (`lua/config/snacks.lua`), not the other Snacks modules. Opened via `<leader>;`. Its `config =` callback is where `config.snacks` gets required (see the load-order note above).
 - Multicursor: vim-visual-multi with `VM_default_mappings = 1`, `VM_mouse_mappings = 1`; `<M-LeftMouse>` adds a cursor.
 - Oil (file manager) opens on `-`; Neo-tree on `<leader>e`.
 - vim-abolish coercion: `cr<key>` in normal mode (camelCase `c`, MixedCase `m`/`p`, snake_case `s`/`_`, UPPER `u`/`U`, kebab `-`/`k`, dot `.`, space `<space>`, custom Title Case `t`). Visual mode uses `<leader>cr<key>` (not `cr`) to avoid colliding with the `c` change operator. Do **not** set `abolish_no_mappings` — vim-visual-multi special-cases `cr` and replays it across cursors, which needs the default `cr` mapping to exist.
@@ -93,7 +96,7 @@ Sources: `nvim_lsp`, `buffer`, `path`. `lspkind.nvim` renders the menu (`mode = 
 - `nvim-lsp-file-operations` (renames/moves driven by LSP references): `lazy = false`, no opts. `lua/config/lsp_file_operations.lua` calls `require("lsp-file-operations").setup()` with no args.
 - `lualine.nvim` (statusline): `event = "VeryLazy"`, dep `nvim-web-devicons`. `lua/config/lualine.lua` calls `setup({ options = { theme = "auto" } })` so it follows the conditional kanagawa / vscpp / vscode colorscheme.
 - gitsigns: `current_line_blame` on, shown at end-of-line.
-- `config.vim` (per-project state): walks up from cwd for a project root (`.git`/`.clangd`/`CMakeLists.txt`/`package.json`/`.nvim`) and sets up `<projectRoot>/.nvim/` with a `spell/` dir (`en.utf-8.add` prepended to `spellfile` so `zg` writes there), `undofile` + `undodir = <root>/.nvim/undo`, and an auto-generated `.gitignore` (`spell/*.spl`, `undo/*`). `:SpellAllGood` loops `]szg` to accept every misspelling suggestion. `spell`/`spelllang=en` is on globally. If `<projectRoot>/.nvim/init.lua` exists it is `dofile`d at the end (protected — a broken file warns, never breaks startup); this is the hook for a repo to register its own DAP configs / keymaps / commands without touching the global config.
+- `config.vim` (per-project state): walks up from cwd for a project root (only `.git` or `.nvim` — see `lua/config/vim.lua`) and sets up `<projectRoot>/.nvim/` with a `spell/` dir (`en.utf-8.add` prepended to `spellfile` so `zg` writes there), `undofile` + `undodir = <root>/.nvim/undo`, and an auto-generated `.gitignore` (`spell/*.spl`, `undo/*`). `:SpellAllGood` loops `]szg` to accept every misspelling suggestion. `spell`/`spelllang=en` is on globally. If `<projectRoot>/.nvim/init.lua` exists it is `dofile`d at the end (protected — a broken file warns, never breaks startup); this is the hook for a repo to register its own DAP configs / keymaps / commands without touching the global config.
 
 ## No build / test / lint pipeline
 
