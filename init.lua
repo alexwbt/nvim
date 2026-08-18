@@ -66,29 +66,18 @@ require("config.lsp_file_operations")
 require("config.multicursor")
 require("config.treesitter")
 require("config.conform")
+require("config.autotag")
 require("config.cmp")
 require("config.gitsigns")
 require("config.abolish")
 require("config.dap")
 require("config.lualine")
 require("config.vim")
+require("config.lsp.init")
 
 
 vim.cmd([[colorscheme kanagawa-dragon]])
 vim.cmd([[set fillchars+=vert:\ ]])
-
-
---
--- LSP
---
-require("config.lsp.clangd")
-require("config.lsp.jdtls")
-require("config.lsp.lua")
-require("config.lsp.typescript")
-vim.keymap.set("n", "<F2>", vim.lsp.buf.rename)
-vim.api.nvim_create_user_command("LspLog", function()
-  vim.cmd.edit(vim.lsp.get_log_path())
-end, {})
 
 
 --
