@@ -46,6 +46,13 @@ vim.keymap.set("v", "<S-Tab>", "<gv")
 vim.keymap.set("n", "<A-z>", "<Cmd>set wrap!<CR>", { desc = "Toggle line wrap" })
 vim.keymap.set("n", "<leader>o", "<Cmd>bprevious<CR>", { desc = "Older buffer" })
 vim.keymap.set("n", "<leader>i", "<Cmd>bnext<CR>", { desc = "Newer buffer" })
+vim.keymap.set("n", "<leader><Tab>", "gt", { desc = "Next tab" })
+vim.keymap.set("n", "<leader>`", function()
+  vim.cmd.tabnew()
+  vim.cmd.term()
+  vim.cmd.file("term" .. "-" .. string.format("%x", math.random() * 255))
+end, { desc = "Open terminal in new tab" })
+vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], { desc = "Escape terminal mode" })
 
 
 vim.filetype.add({
