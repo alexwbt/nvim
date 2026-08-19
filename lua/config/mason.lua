@@ -8,14 +8,4 @@
 -- with `vim.lsp.config` + `vim.lsp.enable` (see lua/config/lsp/*.lua), so
 -- mason is only a source of tooling binaries.
 
-require("mason").setup({
-  ensure_installed = {
-    "java-debug-adapter",
-    "java-test",
-    "clangd",
-    "lua-language-server",
-    "typescript-language-server",
-    "prettier",
-    "shfmt",
-  },
-})
+require("mason").setup({})
