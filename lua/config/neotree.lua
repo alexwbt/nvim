@@ -7,7 +7,7 @@ neotree.setup({
   filesystem = {
     bind_to_cwd = false,
     group_empty_dirs = true,
-    scan_mode = "shallow",
+    scan_mode = "deep",
     follow_current_file = {
       enabled = true,
       leave_dirs_open = false,
