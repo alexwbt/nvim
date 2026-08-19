@@ -17,6 +17,9 @@ require("conform").setup({
     sh = { "shfmt" },
     bash = { "shfmt" },
     zsh = { "shfmt" },
+    -- clang-format
+    c = { "clang-format" },
+    cpp = { "clang-format" },
   },
 })
 

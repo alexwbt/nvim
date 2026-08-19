@@ -73,7 +73,7 @@ Global LSP keymaps: `<F2>` = `vim.lsp.buf.rename`, `[d`/`]d` = prev/next diagnos
 ## Formatting (conform.nvim)
 
 - `<A-F>` in normal mode formats with `lsp_fallback = true`.
-- `formatters_by_ft` is actually configured (not empty): `prettier` for js/ts/jsx/tsx/json/jsonc/html/css/scss/yaml/markdown; `shfmt` for sh/bash/zsh. These binaries must be on PATH (node/prettier, shfmt) — rely on the MSYS2 shell PATH above.
+- `formatters_by_ft` is actually configured (not empty): `prettier` for js/ts/jsx/tsx/json/jsonc/html/css/scss/yaml/markdown; `shfmt` for sh/bash/zsh; `clang-format` for c/cpp. These binaries must be on PATH (node/prettier, shfmt, clang-format) — rely on the MSYS2 shell PATH above. For C/C++ this means `<A-F>` shells out to the `clang-format` binary (same as the CLI), not clangd's built-in LSP formatter; `lsp_fallback` only fires if `clang-format` fails.
 
 ## Completion (nvim-cmp)
 
