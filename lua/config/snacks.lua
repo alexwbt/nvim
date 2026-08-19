@@ -1,6 +1,8 @@
 local Snacks = require("snacks")
 
 Snacks.setup({
+  input = { enabled = true },
+  picker = { enabled = true },
   dashboard = {
     preset = {
       header = { "Neovim", align = "left" },

@@ -18,6 +18,8 @@ vim.opt.listchars = {
   trail = "•",
   nbsp = "␣",
 }
+vim.opt.foldmethod = "expr"
+vim.opt.foldlevel = 99
 
 if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
   vim.opt.shell = "bash"
