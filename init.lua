@@ -120,15 +120,8 @@ local js_root_markers = {
   "bun.lockb",
   ".nvmrc",
 }
-local java_root_markers  = {
-  "pom.xml",
-  "mvnw",
-  "mvnw.cmd",
-}
 if has_root_markers(cpp_root_makers) then
   vim.cmd("colorscheme vscpp")
 elseif has_root_markers(js_root_markers) then
   vim.cmd("colorscheme vscode")
-elseif has_root_markers(java_root_markers) then
-  vim.cmd("colorscheme jb")
 end
