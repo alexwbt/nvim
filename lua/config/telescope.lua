@@ -48,6 +48,7 @@ telescope.setup({
   pickers = {
     find_files = {
       hidden = true,
+      no_ignore = true,
     },
     live_grep = {
       hidden = true,
