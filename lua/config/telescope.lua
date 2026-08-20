@@ -11,6 +11,20 @@ vim.keymap.set("n", "<leader>fc", builtin.colorscheme)
 
 
 local telescope = require("telescope")
+local utils = require("telescope.utils")
+
+-- Workaround for https://github.com/nvim-telescope/telescope.nvim/issues/3157
+-- On Windows, `filename_first` splits only on backslash, but many pickers
+-- (buffers, git_*, lsp_*) feed forward-slash paths. Normalize before
+-- transforming so the split works. Patched here so it survives plugin
+-- updates (vs. editing make_entry.lua in the plugin tree).
+local _orig_transform_path = utils.transform_path
+utils.transform_path = function(opts, path)
+  if path ~= nil and utils.iswin then
+    path = path:gsub("/", "\\")
+  end
+  return _orig_transform_path(opts, path)
+end
 
 telescope.setup({
   defaults = {

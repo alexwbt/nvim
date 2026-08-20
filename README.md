@@ -15,13 +15,13 @@ These must be findable on the PATH at runtime.
 
 ### Shell & build toolchain
 
-| Binary        | Why                                                                       | When              |
-|---------------|---------------------------------------------------------------------------|-------------------|
-| `bash`        | Forced as `&shell` on Windows; runs `:!`, jobs, conform, LSP              | always            |
-| `git`         | lazy.nvim bootstrap + plugin clones                                       | install / updates |
-| `gcc`         | compiler used by `tree-sitter` and `make` builds                          | install only      |
-| `make`        | `telescope-fzf-native` build (`build = 'make'`)                           | install only      |
-| `tree-sitter` | required by `nvim-treesitter`'s `ts.install(...)` to fetch and compile parsers | install only   |
+| Binary        | Why                                                                            | When              |
+| ------------- | ------------------------------------------------------------------------------ | ----------------- |
+| `bash`        | Forced as `&shell` on Windows; runs `:!`, jobs, conform, LSP                   | always            |
+| `git`         | lazy.nvim bootstrap + plugin clones                                            | install / updates |
+| `gcc`         | compiler used by `tree-sitter` and `make` builds                               | install only      |
+| `make`        | `telescope-fzf-native` build (`build = 'make'`)                                | install only      |
+| `tree-sitter` | required by `nvim-treesitter`'s `ts.install(...)` to fetch and compile parsers | install only      |
 
 `gcc`/`make`/`tree-sitter` are only needed at install time — not for normal editing.
 
@@ -31,15 +31,15 @@ Configured in `lua/config/lsp/*.lua`. `clangd`, `lua_ls`, `ts_ls` use
 `vim.lsp.config` + `vim.lsp.enable`; `jdtls` is started by the **`nvim-jdtls`**
 plugin (`lua/plugins/jdtls.lua`).
 
-| Binary                            | Languages  | Notes                                                                       |
-|-----------------------------------|------------|-----------------------------------------------------------------------------|
-| `clangd`                          | C / C++    | mason-managed (`ensure_installed`)                                          |
-| `lua-language-server`             | Lua        | mason-managed (`ensure_installed`)                                          |
-| `typescript-language-server[.cmd]`| JS / TS   | mason-managed; `.cmd` suffix on Windows; see `lua/config/lsp/typescript.lua` |
-| `java` (>= 21) or `$JAVA_HOME`    | Java       | jdtls launcher (via nvim-jdtls); deferred — only starts on first `.java` file open |
-| jdtls install                      | Java       | `$JDTLS_HOME`, or `jdtls`/`jdtls.bat` shim on PATH, or a probed common dir  |
-| Lombok jar (optional)             | Java       | auto-discovered from Maven/Gradle caches                                     |
-| java-debug `/` java-test bundles | Java | installed via **mason-tool-installer** (`java-debug-adapter`, `java-test` → `<data>/mason/share`), or manually at `<jdtls-home>/java-debug` + `<jdtls-home>/vscode-java-test`, `stdpath('cache')/java-debug`, or `~/.debug-plugins` — enables Java DAP + JUnit test running |
+| Binary                             | Languages | Notes                                                                                                                                                                                                                                                                       |
+| ---------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `clangd`                           | C / C++   | mason-managed (`ensure_installed`)                                                                                                                                                                                                                                          |
+| `lua-language-server`              | Lua       | mason-managed (`ensure_installed`)                                                                                                                                                                                                                                          |
+| `typescript-language-server[.cmd]` | JS / TS   | mason-managed; `.cmd` suffix on Windows; see `lua/config/lsp/typescript.lua`                                                                                                                                                                                                |
+| `java` (>= 21) or `$JAVA_HOME`     | Java      | jdtls launcher (via nvim-jdtls); deferred — only starts on first `.java` file open                                                                                                                                                                                          |
+| jdtls install                      | Java      | `$JDTLS_HOME`, or `jdtls`/`jdtls.bat` shim on PATH, or a probed common dir                                                                                                                                                                                                  |
+| Lombok jar (optional)              | Java      | auto-discovered from Maven/Gradle caches                                                                                                                                                                                                                                    |
+| java-debug `/` java-test bundles   | Java      | installed via **mason-tool-installer** (`java-debug-adapter`, `java-test` → `<data>/mason/share`), or manually at `<jdtls-home>/java-debug` + `<jdtls-home>/vscode-java-test`, `stdpath('cache')/java-debug`, or `~/.debug-plugins` — enables Java DAP + JUnit test running |
 
 mason-tool-installer auto-installs `clangd`/`lua-language-server`/`typescript-language-server`
 on first launch (see the mason note below); they're then available to nvim only.
@@ -51,10 +51,10 @@ test running are silently disabled.
 
 Configured in `lua/config/conform.lua`. Triggered by `<A-F>` in normal mode.
 
-| Binary     | Filetypes                                                        |
-|------------|------------------------------------------------------------------|
-| `prettier` | js, ts, jsx, tsx, json, jsonc, html, css, scss, yaml, markdown  |
-| `shfmt`    | sh, bash, zsh                                                    |
+| Binary     | Filetypes                                                      |
+| ---------- | -------------------------------------------------------------- |
+| `prettier` | js, ts, jsx, tsx, json, jsonc, html, css, scss, yaml, markdown |
+| `shfmt`    | sh, bash, zsh                                                  |
 
 `prettier` and `shfmt` are mason-tool-installer-managed (`ensure_installed`).
 `prettier` implies `node` on PATH.
@@ -66,16 +66,16 @@ auto-registered `java` adapter (requires the java-debug `/` vscode-java-test
 bundles — see the LSP table above); `:DapNew` discovers main classes and JUnit
 tests. See `lua/config/dap.lua`.
 
-| Binary | When                          |
-|--------|-------------------------------|
+| Binary | When                                    |
+| ------ | --------------------------------------- |
 | `gdb`  | only when launching a C/C++ DAP session |
 
 ### Other
 
-| Binary   | Why                                        |
-|----------|--------------------------------------------|
-| `node`   | prettier + typescript-language-server      |
-| `zoxide` | `<leader>cd` (telescope-zoxide extension)   |
+| Binary   | Why                                       |
+| -------- | ----------------------------------------- |
+| `node`   | prettier + typescript-language-server     |
+| `zoxide` | `<leader>cd` (telescope-zoxide extension) |
 
 ### mason.nvim + mason-tool-installer.nvim
 
@@ -110,3 +110,4 @@ Leader is space. The full reference lives in `lua/config/*.lua` and `init.lua`.
 - `<A-F>` — format buffer (conform, `lsp_fallback = true`). `<F2>` — LSP rename. `[d` / `]d` — prev / next diagnostic. `<leader><space>` — LSP code action.
 - `<F5>`/`<F6>`/`<F7>`/`<F8>`/`<F9>`/`<F10>` — DAP continue / step over / step into / step out / toggle breakpoint / restart. `<S-F5>` or `<F17>` — terminate. `<leader>dr` REPL, `<leader>du` dap-ui toggle, `<leader>ds` sessions sidebar. `:ClearBreakpoints`.
 - `:LspLog` — open the LSP log. `:LspLogClear` — truncate the LSP log file. `:LspInfo` — show attached LSP clients as a table (name, pid, memory, buffers, root; resolved from the OS). `:JdtlsCleanWorkspace` (then restart) — wipe jdtls's per-project cache when Java indexes go stale. `:DapNew` (Java) — auto-discover main classes / JUnit tests and debug them. `:SpellAllGood` — accept every misspelling suggestion.
+
