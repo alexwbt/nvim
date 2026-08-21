@@ -1,4 +1,3 @@
-
 vim.keymap.set("n", "<leader>e", "<Cmd>Neotree toggle<CR>")
 
 local neotree = require("neo-tree")
@@ -18,3 +17,17 @@ neotree.setup({
   }
 })
 
+vim.keymap.set("n", "<leader>ge", function()
+  local manager = require("neo-tree.sources.manager")
+  local states = manager._get_all_states()
+  local changed = false
+  for _, state in ipairs(states) do
+    if state.name == "filesystem" then
+      state.group_empty_dirs = not state.group_empty_dirs
+      changed = true
+    end
+  end
+  if changed then
+    manager.refresh("filesystem")
+  end
+end)
