@@ -23,6 +23,7 @@ vim.opt.foldlevel = 99
 vim.opt.cmdheight = 0
 
 if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
+  vim.g.is_windows = true
   vim.opt.shell = "bash"
   vim.opt.shellcmdflag = "-c"
   vim.opt.shellquote = ""
@@ -120,8 +121,15 @@ local js_root_markers = {
   "bun.lockb",
   ".nvmrc",
 }
+local java_root_markers  = {
+  "pom.xml",
+  "mvnw",
+  "mvnw.cmd",
+}
 if has_root_markers(cpp_root_makers) then
   vim.cmd("colorscheme vscpp")
 elseif has_root_markers(js_root_markers) then
   vim.cmd("colorscheme vscode")
+elseif has_root_markers(java_root_markers) then
+  vim.cmd("colorscheme jb")
 end

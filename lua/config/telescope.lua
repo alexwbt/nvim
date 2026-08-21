@@ -20,7 +20,7 @@ local utils = require("telescope.utils")
 -- updates (vs. editing make_entry.lua in the plugin tree).
 local _orig_transform_path = utils.transform_path
 utils.transform_path = function(opts, path)
-  if path ~= nil and utils.iswin then
+  if path ~= nil and vim.g.is_windows then
     path = path:gsub("/", "\\")
   end
   return _orig_transform_path(opts, path)
@@ -48,7 +48,6 @@ telescope.setup({
   pickers = {
     find_files = {
       hidden = true,
-      no_ignore = true,
     },
     live_grep = {
       hidden = true,

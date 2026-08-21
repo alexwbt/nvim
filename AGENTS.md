@@ -35,12 +35,15 @@ Installed colorschemes (from `lua/plugins/colorscheme.lua`): vscode, onedarkpro,
 `init.lua` forces the shell to MSYS2 bash when `has("win32")`/`has("win64")`:
 
 ```
+vim.g.is_windows = true
 vim.opt.shell = "bash"
 vim.opt.shellcmdflag = "-c"
 vim.opt.shellquote = ""
 vim.opt.shellxquote = ""
 vim.opt.shellslash = true
 ```
+
+`vim.g.is_windows` is the global flag for "current env is Windows" — prefer checking `vim.g.is_windows` over repeated `vim.fn.has("win32")` calls (e.g. `lua/config/telescope.lua` uses it for the `filename_first` backslash-normalization workaround).
 
 So `:!cmd`, terminal jobs, conform formatters, and LSP spawns inherit a Unix-like PATH (git, `make`, compilers, node). Do NOT "fix" this back to `cmd.exe`/powershell — `telescope-fzf-native.nvim` (`build = 'make'`) and treesitter parsers rely on it.
 
@@ -93,7 +96,7 @@ Sources: `nvim_lsp`, `buffer`, `path`. `lspkind.nvim` renders the menu (`mode = 
 - `spell`/`spelllang=en` on globally; `spelloptions = "camel,noplainbuffer"`, `spellcapcheck = ""`.
 - Custom extension map in `init.lua` via `vim.filetype.add`: `.h`/`.hpp` → `cpp`, `.vs`/`.fs` → `glsl`.
 - Treesitter highlighting is started via a `FileType` autocmd that `pcall(vim.treesitter.start)`s — NOT via the legacy `ensure_installed`/`highlight` module config. The parser list lives explicitly in `lua/config/treesitter.lua` (`ts.install(...)`); the plugin spec carries only `build = ":TSUpdate"`. Adding a parser = add to that list and run `:TSUpdate` (shells out to the `tree-sitter` CLI).
-- Telescope `file_ignore_patterns`: `%.git`, `%.vs`, `%.idea` — keep updated for new large generated dirs. `path_display = "filename_first"`. `find_files`/`live_grep` have `hidden = true`. Leader mappings: `<leader>ff` files, `<leader>fo` oldfiles, `<leader>fg` live grep, `<leader>fr` LSP refs, `<leader>fd` LSP defs, `<leader>fi` LSP impls, `<leader>fb` buffers, `<leader>fh` help, `<leader>fc` colorscheme (preview enabled), `<leader>cd` zoxide.
+- Telescope `file_ignore_patterns`: `%.git`, `%.vs`, `%.idea` — keep updated for new large generated dirs. `path_display = "filename_first"`. `find_files`/`live_grep` have `hidden = true`. Leader mappings: `<leader>ff` files, `<leader>fo` oldfiles, `<leader>fg` live grep, `<leader>fr` LSP refs, `<leader>fd` LSP defs, `<leader>fi` LSP impls, `<leader>fb` buffers, `<leader>fh` help, `<leader>fc` colorscheme (preview enabled), `<leader>cd` zoxide. `utils.transform_path` is monkey-patched in `lua/config/telescope.lua` to normalize `/` → `\` on Windows before `filename_first` splits (workaround for [telescope#3157](https://github.com/nvim-telescope/telescope.nvim/issues/3157); done in config so it survives plugin updates).
 - `<Esc>` in normal mode clears search highlights (`:noh`); in terminal mode it escapes (`<C-\><C-n>`). Be careful adding other `<Esc>` bindings — they override this.
 - `init.lua` keymaps: `<C-j>`/`<C-k>` jump 10 lines (normal + visual); `<M-j>`/`<M-k>` move line/block up/down and reindent; `<A-z>` toggles `wrap`; `<leader>o`/`<leader>i` = prev/next buffer; `<leader><Tab>` next tab; `<leader>\`` opens a terminal in a new tab. Visual-mode `<Tab>`/`<S-Tab>` indent/dedent the selection (`>gv`/`<gv`). Insert-mode `{<CR>` opens a brace block and positions cursor inside; `{;<CR>` does the same with a trailing `;`.
 - Snacks.nvim (`lazy = false`, `priority = 1000`): `dashboard` + `input` + `picker` are enabled in `lua/config/snacks.lua` (not only dashboard). Dashboard opened via `<leader>;`. Its `config =` callback is where `config.snacks` gets required (see the load-order note above).

@@ -8,6 +8,8 @@ See `AGENTS.md` for the full architecture / conventions write-up.
 On Windows, `init.lua` forces `&shell = "bash"` with Unix-style flags, so every
 external program (`:!`, conform, LSPs) is resolved against the bash PATH, not
 `cmd.exe`/PowerShell. On Linux this is a no-op — the native shell/PATH apply.
+`vim.g.is_windows` is set in that same block and is the global flag for "current
+env is Windows"; prefer it over repeated `vim.fn.has("win32")` calls.
 
 ## External dependencies
 
