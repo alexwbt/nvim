@@ -67,3 +67,25 @@ vim.api.nvim_create_user_command("SpellAllGood", function()
     vim.cmd("normal! ]szg")
   end
 end, {})
+
+vim.api.nvim_create_user_command("FixSpell", function()
+  local sf = vim.opt.spellfile:get()
+  local path = sf and sf[1]
+  if not path or vim.fn.filereadable(path) ~= 1 then
+    vim.notify("FixSpell: no writable spellfile in 'spellfile' option", vim.log.levels.ERROR)
+    return
+  end
+  local lines = vim.fn.readfile(path)
+  local seen, dedup = {}, {}
+  for _, w in ipairs(lines) do
+    local lw = w:lower()
+    if not seen[lw] then
+      seen[lw] = true
+      dedup[#dedup + 1] = lw
+    end
+  end
+  table.sort(dedup)
+  vim.fn.writefile(dedup, path)
+  vim.cmd("mkspell! " .. vim.fn.fnameescape(path))
+  vim.notify("FixSpell: " .. path .. " sorted + deduped (" .. #dedup .. " words)", vim.log.levels.INFO)
+end, {})

@@ -20,6 +20,7 @@ require("conform").setup({
     -- clang-format
     c = { "clang-format" },
     cpp = { "clang-format" },
+    glsl = { "clang-format" },
   },
 })
 
