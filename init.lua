@@ -18,9 +18,10 @@ vim.opt.listchars = {
   trail = "•",
   nbsp = "␣",
 }
+vim.opt.cmdheight = 0
 vim.opt.foldmethod = "expr"
 vim.opt.foldlevel = 99
-vim.opt.cmdheight = 0
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 
 if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
   vim.g.is_windows = true
