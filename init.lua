@@ -75,6 +75,7 @@ require("config.lsp")
 -- plugins
 require("config.lazy")
 require("config.telescope")
+require("config.fzf-lua")
 require("config.oil")
 require("config.neotree")
 require("config.lsp_file_operations")
