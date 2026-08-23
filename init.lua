@@ -22,6 +22,7 @@ vim.opt.cmdheight = 0
 vim.opt.foldmethod = "expr"
 vim.opt.foldlevel = 99
 vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.cmd([[set fillchars+=vert:\ ]])
 
 if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
   vim.g.is_windows = true
@@ -49,8 +50,6 @@ vim.keymap.set("n", "<Esc>", ":noh<CR>")
 vim.keymap.set("v", "<Tab>", ">gv")
 vim.keymap.set("v", "<S-Tab>", "<gv")
 vim.keymap.set("n", "<A-z>", "<Cmd>set wrap!<CR>", { desc = "Toggle line wrap" })
-vim.keymap.set("n", "<leader>o", "<Cmd>bprevious<CR>", { desc = "Older buffer" })
-vim.keymap.set("n", "<leader>i", "<Cmd>bnext<CR>", { desc = "Newer buffer" })
 vim.keymap.set("n", "<leader><Tab>", "gt", { desc = "Next tab" })
 vim.keymap.set("n", "<leader>`", function()
   vim.cmd.tabnew()
@@ -70,6 +69,10 @@ vim.filetype.add({
 })
 
 
+require("config.jumplist")
+require("config.project")
+require("config.lsp")
+-- plugins
 require("config.lazy")
 require("config.telescope")
 require("config.oil")
@@ -85,12 +88,6 @@ require("config.abolish")
 require("config.dap")
 require("config.wpm")
 require("config.lualine")
-require("config.vim")
-require("config.lsp.init")
-
-
-vim.cmd([[colorscheme kanagawa-dragon]])
-vim.cmd([[set fillchars+=vert:\ ]])
 
 
 --
@@ -106,13 +103,13 @@ local function has_root_markers(root_markers)
   return false
 end
 
-local cpp_root_makers = {
+local cpp_root_makers   = {
   "CMakeLists.txt",
   ".clangd",
   ".clang-format",
   ".clang-tidy"
 }
-local js_root_markers = {
+local js_root_markers   = {
   "package.json",
   "tsconfig.json",
   "jsconfig.json",
@@ -123,7 +120,7 @@ local js_root_markers = {
   "bun.lockb",
   ".nvmrc",
 }
-local java_root_markers  = {
+local java_root_markers = {
   "pom.xml",
   "mvnw",
   "mvnw.cmd",
@@ -134,4 +131,6 @@ elseif has_root_markers(js_root_markers) then
   vim.cmd("colorscheme vscode")
 elseif has_root_markers(java_root_markers) then
   vim.cmd("colorscheme jb")
+else
+  vim.cmd("colorscheme kanagawa-dragon")
 end

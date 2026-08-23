@@ -6,9 +6,9 @@ Neovim configuration repo (Windows + MSYS2). Managed by [lazy.nvim](https://gith
 
 `init.lua` sets options, keymaps, filetypes, then `require`s configs in this fixed order — do not reorder (changing it or removing a `require` causes startup errors):
 
-1. `config.lazy` (must be first; bootstraps lazy.nvim, auto-imports everything under `lua/plugins/`)
-2. `config.telescope` → `config.oil` → `config.neotree` → `config.lsp_file_operations` → `config.multicursor` → `config.treesitter` → `config.conform` → `config.autotag` → `config.cmp` → `config.gitsigns` → `config.abolish` → `config.dap` → `config.lualine` → `config.vim` → `config.lsp.init`
-3. `config.lsp.init` requires per-server configs internally (clangd → jdtls → lua → typescript) — it's part of the chain (step 2), not after it.
+1. `config.jumplist` → `config.project` → `config.lsp` (pre-lazy; these only use built-in APIs and define keymaps, no plugin requires — safe before lazy.nvim is bootstrapped). `config.lsp` is the module at `lua/config/lsp/init.lua`; it requires per-server configs internally (clangd → jdtls → lua → typescript), which call `vim.lsp.config` + `vim.lsp.enable` (these only register FileType autocmds; servers spawn on buffer open, after lazy+mason have loaded, so mason's PATH prepend is in effect by then). `config.jumplist` (`<leader>o`/`<leader>i` — walk the jumplist skipping same-buffer entries) and `config.project` (per-project `spell/`+`undodir` state, `.nvim/init.lua` hook) must load before the colorscheme since project init can set `vim.g.jdtls_formatter`/`vim.g.jdtls_settings`.
+2. `config.lazy` (bootstraps lazy.nvim, auto-imports everything under `lua/plugins/`).
+3. `config.telescope` → `config.oil` → `config.neotree` → `config.lsp_file_operations` → `config.multicursor` → `config.treesitter` → `config.conform` → `config.autotag` → `config.cmp` → `config.gitsigns` → `config.abolish` → `config.dap` → `config.wpm` → `config.lualine`
 4. `config.snacks` is NOT required from `init.lua` — it runs in the `config =` callback of the snacks plugin spec (`lua/plugins/snacks.lua`, `lazy = false`, `priority = 1000`).
 5. Colorscheme (conditional, last — reads `getcwd()` markers, see below).
 
@@ -22,11 +22,12 @@ Neovim configuration repo (Windows + MSYS2). Managed by [lazy.nvim](https://gith
 
 ## Colorscheme (conditional, must stay last)
 
-`init.lua` sets `colorscheme kanagawa-dragon`, then overrides based on `getcwd()` markers:
+`init.lua` picks a colorscheme based on `getcwd()` markers (falling back to `kanagawa-dragon` when none match):
 
 - C++ root (`CMakeLists.txt`, `.clangd`, `.clang-format`, `.clang-tidy`) → `colorscheme vscpp` (the hand-rolled `colors/vscpp.lua`).
 - JS root (`package.json`, `tsconfig.json`, `jsconfig.json`, `node_modules`, `yarn.lock`, `pnpm-lock.yaml`, `package-lock.json`, `bun.lockb`, `.nvmrc`) → `colorscheme vscode`.
-- **No Java branch** — `jb.nvim` is installed (in `lua/plugins/colorscheme.lua`) but never auto-selected; Java projects keep `kanagawa-dragon`.
+- Java root (`pom.xml`, `mvnw`, `mvnw.cmd`) → `colorscheme jb` (`jb.nvim`, in `lua/plugins/colorscheme.lua`).
+- No match → `colorscheme kanagawa-dragon`.
 
 Installed colorschemes (from `lua/plugins/colorscheme.lua`): vscode, onedarkpro, github, kanagawa, gruvbox, tokyonight, monokai-pro, jb. `<leader>fc` previews all of them.
 
@@ -98,7 +99,7 @@ Sources: `nvim_lsp`, `buffer`, `path`. `lspkind.nvim` renders the menu (`mode = 
 - Treesitter highlighting is started via a `FileType` autocmd that `pcall(vim.treesitter.start)`s — NOT via the legacy `ensure_installed`/`highlight` module config. The parser list lives explicitly in `lua/config/treesitter.lua` (`ts.install(...)`); the plugin spec carries only `build = ":TSUpdate"`. Adding a parser = add to that list and run `:TSUpdate` (shells out to the `tree-sitter` CLI).
 - Telescope `file_ignore_patterns`: `%.git`, `%.vs`, `%.idea` — keep updated for new large generated dirs. `path_display = "filename_first"`. `find_files`/`live_grep` have `hidden = true`. Leader mappings: `<leader>ff` files, `<leader>fo` oldfiles, `<leader>fg` live grep, `<leader>fr` LSP refs, `<leader>fd` LSP defs, `<leader>fi` LSP impls, `<leader>fb` buffers, `<leader>fh` help, `<leader>fc` colorscheme (preview enabled), `<leader>cd` zoxide. `utils.transform_path` is monkey-patched in `lua/config/telescope.lua` to normalize `/` → `\` on Windows before `filename_first` splits (workaround for [telescope#3157](https://github.com/nvim-telescope/telescope.nvim/issues/3157); done in config so it survives plugin updates).
 - `<Esc>` in normal mode clears search highlights (`:noh`); in terminal mode it escapes (`<C-\><C-n>`). Be careful adding other `<Esc>` bindings — they override this.
-- `init.lua` keymaps: `<C-j>`/`<C-k>` jump 10 lines (normal + visual); `<M-j>`/`<M-k>` move line/block up/down and reindent; `<A-z>` toggles `wrap`; `<leader>o`/`<leader>i` = prev/next buffer; `<leader><Tab>` next tab; `<leader>\`` opens a terminal in a new tab. Visual-mode `<Tab>`/`<S-Tab>` indent/dedent the selection (`>gv`/`<gv`). Insert-mode `{<CR>` opens a brace block and positions cursor inside; `{;<CR>` does the same with a trailing `;`.
+- `init.lua` keymaps: `<C-j>`/`<C-k>` jump 10 lines (normal + visual); `<M-j>`/`<M-k>` move line/block up/down and reindent; `<A-z>` toggles `wrap`; `<leader>o`/`<leader>i` = prev/next different file in the jumplist (walks `getjumplist()` skipping same-buffer entries); `<leader><Tab>` next tab; `<leader>\`` opens a terminal in a new tab. Visual-mode `<Tab>`/`<S-Tab>` indent/dedent the selection (`>gv`/`<gv`). Insert-mode `{<CR>` opens a brace block and positions cursor inside; `{;<CR>` does the same with a trailing `;`.
 - Snacks.nvim (`lazy = false`, `priority = 1000`): `dashboard` + `input` + `picker` are enabled in `lua/config/snacks.lua` (not only dashboard). Dashboard opened via `<leader>;`. Its `config =` callback is where `config.snacks` gets required (see the load-order note above).
 - Multicursor: vim-visual-multi with `VM_default_mappings = 1`, `VM_mouse_mappings = 1`; `<M-LeftMouse>` adds a cursor (`VM_maps["Mouse Cursor"]`).
 - Oil (file manager) opens on `-` (shows icon/permissions/size/mtime, hidden files visible). Neo-tree on `<leader>e` (`bind_to_cwd = false`, `follow_current_file` on, `filtered_items.visible = true`).
@@ -108,4 +109,4 @@ Sources: `nvim_lsp`, `buffer`, `path`. `lspkind.nvim` renders the menu (`mode = 
 - `lualine.nvim` (statusline, `event = "VeryLazy"`): `theme = "auto"` (follows the conditional colorscheme), `lualine_z` = current time, `lualine_y` = `{ "location", "lsp_status" }`. Dep `nvim-web-devicons`.
 - gitsigns: `current_line_blame` on, `virt_text_pos = "eol"`, `delay = 500`.
 - fidget.nvim: `event = "LspAttach"`, `opts = {}` (LSP progress notifications).
-- `config.vim` (per-project state): walks up from cwd for a project root (only `.git` or `.nvim`) and sets up `<projectRoot>/.nvim/` with a `spell/` dir (`en.utf-8.add` prepended to `spellfile` so `zg` writes there), `undodir = <root>/.nvim/undo`, and an auto-generated `.gitignore` (`spell/*.spl`, `undo/*`). `:SpellAllGood` loops `]szg` to accept every misspelling suggestion. If `<projectRoot>/.nvim/init.lua` exists it is `dofile`d at the end (protected — a broken file warns, never breaks startup); this is the hook for a repo to register its own DAP configs / keymaps / commands / set `vim.g.jdtls_formatter` / `vim.g.jdtls_settings` without touching the global config.
+- `config.project` (per-project state): walks up from cwd for a project root (only `.git` or `.nvim`) and sets up `<projectRoot>/.nvim/` with a `spell/` dir (`en.utf-8.add` prepended to `spellfile` so `zg` writes there), `undodir = <root>/.nvim/undo`, and an auto-generated `.gitignore` (`spell/*.spl`, `undo/*`). `:SpellAllGood` loops `]szg` to accept every misspelling suggestion. If `<projectRoot>/.nvim/init.lua` exists it is `dofile`d at the end (protected — a broken file warns, never breaks startup); this is the hook for a repo to register its own DAP configs / keymaps / commands / set `vim.g.jdtls_formatter` / `vim.g.jdtls_settings` without touching the global config.
