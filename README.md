@@ -51,7 +51,7 @@ test running are silently disabled.
 
 ### Formatters (conform.nvim)
 
-Configured in `lua/config/conform.lua`. Triggered by `<leader>F` in normal mode.
+Configured in `lua/config/conform.lua`. Triggered by `<A-F>` in normal mode.
 
 | Binary     | Filetypes                                                      |
 | ---------- | -------------------------------------------------------------- |
@@ -112,7 +112,7 @@ Leader is space. The full reference lives in `lua/config/*.lua` and `init.lua`.
 - `-` — Oil (open parent dir as buffer). `<leader>e` — Neo-tree toggle.
 - `<leader>ff` `<leader>fo` `<leader>fg` `<leader>fr` `<leader>fd` `<leader>fi` `<leader>fb` `<leader>fh` `<leader>fc` — Telescope (files, oldfiles, live grep, LSP refs/defs/impls, buffers, help, colorscheme). `<leader>fg` (live grep) is routed to **fzf-lua** instead of telescope — it streams `rg` once and prunes on backspace instead of re-spawning per keystroke (avoids the telescope `live_grep` freeze on Windows/MSYS2). Requires the `fzf` binary on PATH (MSYS2: `pacman -S mingw-w64-ucrt-x86_64-fzf`). `<leader>cd` — zoxide.
 - `<C-j>` / `<C-k>` — jump 10 lines (normal + visual). `<M-j>` / `<M-k>` — move line/block up/down with reindent. `<A-z>` — toggle word wrap. `<leader>o` / `<leader>i` — prev / next file in the jumplist. `<leader>;` — Snacks dashboard.
-- `<leader>F` — format buffer (conform, `lsp_fallback = true`). `<F2>` — LSP rename. `[d` / `]d` — prev / next diagnostic. `<leader><space>` — LSP code action.
+- `<A-F>` — format buffer (conform, `lsp_fallback = true`). `<F2>` — LSP rename. `[d` / `]d` — prev / next diagnostic. `<leader><space>` — LSP code action.
 - `<F5>`/`<F6>`/`<F7>`/`<F8>`/`<F9>`/`<F10>` — DAP continue / step over / step into / step out / toggle breakpoint / restart. `<S-F5>` or `<F17>` — terminate. `<leader>dr` REPL, `<leader>du` dap-ui toggle, `<leader>ds` sessions sidebar. `:ClearBreakpoints`.
 - `:LspLog` — open the LSP log. `:LspLogClear` — truncate the LSP log file. `:LspInfo` — show attached LSP clients as a table (name, pid, memory, buffers, root; resolved from the OS). `:JdtlsCleanWorkspace` (then restart) — wipe jdtls's per-project cache when Java indexes go stale. `:DapNew` (Java) — auto-discover main classes / JUnit tests and debug them. `:SpellAllGood` — accept every misspelling suggestion.
 
