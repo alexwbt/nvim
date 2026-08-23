@@ -90,6 +90,9 @@ require("config.dap")
 require("config.wpm")
 require("config.lualine")
 
+vim.api.nvim_create_user_command("W", "write", { desc = "Write (alias for :w)" })
+vim.api.nvim_create_user_command("Wa", "wall", { desc = "Write all (alias for :wa)" })
+
 
 --
 -- Project Type Based Defaults
