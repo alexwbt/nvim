@@ -42,10 +42,12 @@ vim.api.nvim_create_user_command("LspInfo", function()
       return total_mem_bytes
     end
     if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
-      local line = vim.fn.systemlist({
-        "wmic", "ComputerSystem", "get", "TotalPhysicalMemory", "/format:csv",
-      })[3] or ""
-      total_mem_bytes = tonumber((line:match(",([%d]+)"))) or 0
+      -- wmic is deprecated/absent on newer Windows; use PowerShell CIM instead.
+      local out = vim.fn.systemlist({
+        "powershell", "-NoProfile", "-Command",
+        "[math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory)",
+      })
+      total_mem_bytes = tonumber((out[1] or ""):match("%d+")) or 0
     elseif vim.fn.has("mac") == 1 then
       total_mem_bytes = tonumber((vim.fn.systemlist("sysctl -n hw.memsize")[1] or ""):match("%d+")) or 0
     else
@@ -71,32 +73,30 @@ vim.api.nvim_create_user_command("LspInfo", function()
     local matched = false
 
     if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
-      -- wmic /format:csv output is alphabetized: Node,CommandLine,Name,
-      -- ProcessId,WorkingSetSize. CommandLine may contain commas (and is
-      -- inconsistently quoted), so parse from the trailing end where Name,
-      -- ProcessId, WorkingSetSize are always clean, comma-free tokens.
+      -- wmic is deprecated/absent on newer Windows (its CSV formatter can also
+      -- emit "Invalid XML content" for queries that include CommandLine), so
+      -- use PowerShell's Get-CimInstance instead. Output is tab-delimited
+      -- (pid\tname\twss\tcmdline); tab is replaced with a space inside
+      -- cmdline to keep it a single field.
       local out = vim.fn.systemlist({
-        "wmic", "process", "get",
-        "ProcessId,Name,WorkingSetSize,CommandLine",
-        "/format:csv",
+        "powershell", "-NoProfile", "-Command",
+        'Get-CimInstance Win32_Process -Property Name,ProcessId,WorkingSetSize,CommandLine | ForEach-Object { "{0}`t{1}`t{2}`t{3}" -f $_.ProcessId,$_.Name,$_.WorkingSetSize,($_.CommandLine -replace "`t"," ") }',
       })
       local pid, wss, exact = nil, 0, nil
       local function is_wrapper(name)
         local n = vim.fn.fnamemodify(name, ":t"):lower()
         return n == "cmd.exe" or n == "sh.exe" or n == "shell.exe"
       end
-      local function csv_fields(line)
-        return vim.split(line, ",", { plain = true })
-      end
       for _, line in ipairs(out) do
-        local parts = csv_fields(line)
-        local wssv = tonumber(parts[#parts])
-        local pv = parts[#parts - 1]
-        local name = parts[#parts - 2]
-        local cmdline = table.concat(parts, ",", 2, #parts - 2)
-        if name and pv and wssv then
+        local parts = vim.split(line, "\t", { plain = true })
+        -- parts: [1]=pid [2]=name [3]=wss [4]=cmdline (may be empty/absent)
+        local pv = parts[1]
+        local name = parts[2]
+        local wssv = tonumber(parts[3])
+        local cmdline = parts[4] or ""
+        if pv and name and wssv then
           local name_match = vim.fn.fnamemodify(name, ":t"):lower() == term:lower()
-          local cmd_match = cmdline and cmdline:lower():find(term:lower(), 1, true) ~= nil
+          local cmd_match = cmdline:lower():find(term:lower(), 1, true) ~= nil
           -- Skip the launcher wrapper (cmd.exe/sh.exe) so we get the real server pid.
           if (name_match or cmd_match) and not is_wrapper(name) then
             if name_match and exact == nil then

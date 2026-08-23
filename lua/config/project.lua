@@ -79,7 +79,9 @@ vim.api.nvim_create_user_command("FixSpell", function()
   local seen, dedup = {}, {}
   for _, w in ipairs(lines) do
     local lw = w:lower()
-    if not seen[lw] then
+    if #lw <= 1 then
+      -- skip single-character entries
+    elseif not seen[lw] then
       seen[lw] = true
       dedup[#dedup + 1] = lw
     end
