@@ -305,11 +305,6 @@ vim.api.nvim_create_autocmd("FileType", {
           configuration = {
             maven = { notCoveredPluginExecutionSeverity = "ignore" },
           },
-          compile = {
-            nullAnalysis = {
-              mode = "automatic",
-            },
-          },
           format = {
             settings = {
               -- Use a per-project Eclipse XML formatter if present, otherwise
