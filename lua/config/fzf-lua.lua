@@ -3,11 +3,11 @@ local fzf = require("fzf-lua")
 fzf.setup({
   -- Reuse the same ignore patterns telescope uses
   files = {
-    file_ignore_patterns = { "%.git", "%.vs", "%.idea" },
+    file_ignore_patterns = { "^%.git", "^%.vs", "^%.idea" },
   },
   grep = {
     -- rg is reused/streamed; backspace prunes instead of re-spawning
-    file_ignore_patterns = { "%.git", "%.vs", "%.idea" },
+    file_ignore_patterns = { "^%.git", "^%.vs", "^%.idea" },
   },
   winopts = {
     -- almost fullscreen (matches telescope's width=0.99 height=0.99)

@@ -21,6 +21,8 @@ feedkeys
 fg
 filereadable
 fn
+fullscreen
+fzf
 getcwd
 getjumplist
 github
@@ -46,6 +48,7 @@ lockb
 lombok
 lsp
 lua
+lua's
 marker
 multicursor
 mvn
@@ -61,6 +64,7 @@ ps
 reindent
 repl
 repo's
+rg
 shfmt
 spellfile
 stdpath

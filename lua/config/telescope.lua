@@ -29,9 +29,9 @@ end
 telescope.setup({
   defaults = {
     file_ignore_patterns = {
-      "%.git",
-      "%.vs",
-      "%.idea",
+      "^%.git",
+      "^%.vs",
+      "^%.idea",
     },
     path_display = {
       "filename_first",
