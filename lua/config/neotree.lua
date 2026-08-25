@@ -14,7 +14,7 @@ neotree.setup({
     filtered_items = {
       visible = true,
     },
-  }
+  },
 })
 
 vim.keymap.set("n", "<leader>ge", function()

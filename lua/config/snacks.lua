@@ -11,7 +11,15 @@ Snacks.setup({
         { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
         { icon = " ", key = "g", desc = "Find Text", action = ":Telescope live_grep" },
         { icon = " ", key = "o", desc = "Recent Files", action = ":Telescope oldfiles" },
-        { icon = " ", key = "c", desc = "Jump Dir (zoxide)", action = ":Telescope zoxide list" },
+        {
+          icon = " ",
+          key = "e",
+          desc = "Explore Files",
+          action = function()
+            vim.cmd(":Neotree")
+            vim.cmd.only()
+          end
+        },
         { icon = " ", key = "q", desc = "Quit", action = ":qa" },
       },
     },
