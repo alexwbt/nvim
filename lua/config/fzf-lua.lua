@@ -8,6 +8,12 @@ fzf.setup({
   grep = {
     -- rg is reused/streamed; backspace prunes instead of re-spawning
     file_ignore_patterns = { "^%.git", "^%.vs", "^%.idea" },
+    actions = {
+      ["ctrl-s"] = function(_, opts)
+        local rg_query = opts and opts.search or ""
+        require("spectre").open({ search_text = rg_query })
+      end,
+    },
   },
   winopts = {
     -- almost fullscreen (matches telescope's width=0.99 height=0.99)
