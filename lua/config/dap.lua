@@ -33,6 +33,9 @@ vim.keymap.set("n", "<leader>dr", dap.repl.open, { desc = "DAP REPL" })
 vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "DAP UI" })
 vim.keymap.set("n", "<leader>ds", sessions_sidebar.toggle, { desc = "DAP sessions sidebar" })
 vim.api.nvim_create_user_command("ClearBreakpoints", dap.clear_breakpoints, { desc = "DAP clear breakpoints" })
+vim.keymap.set("n", "<Leader>bc", function()
+  dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
+end, { desc = "DAP: Set Conditional Breakpoint" })
 
 dap.listeners.after.event_initialized["dapui"] = function() dapui.open() end
 
