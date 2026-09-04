@@ -89,8 +89,8 @@ mason prepends `<data>/mason/bin/` to `PATH` only within Neovim-spawned jobs (LS
 
 ## Formatting (conform.nvim)
 
-- `<A-F>` (normal) formats with `lsp_fallback = true`, `async = true`.
-- `formatters_by_ft` (in `lua/config/conform.lua`): `prettier` for js/ts/jsx/tsx/json/jsonc/html/css/scss/yaml/markdown; `shfmt` for sh/bash/zsh; `clang-format` for c/cpp. Binaries must be on PATH (node/prettier, shfmt, clang-format) via the MSYS2 shell PATH. For C/C++, `<A-F>` shells out to the `clang-format` binary (same as the CLI), not clangd's built-in LSP formatter; `lsp_fallback` only fires if `clang-format` fails.
+- `<leader>F` (normal) formats with `lsp_fallback = true`, `async = true`.
+- `formatters_by_ft` (in `lua/config/conform.lua`): `prettier` for js/ts/jsx/tsx/json/jsonc/html/css/scss/yaml/markdown; `shfmt` for sh/bash/zsh; `clang-format` for c/cpp. Binaries must be on PATH (node/prettier, shfmt, clang-format) via the MSYS2 shell PATH. For C/C++, `<leader>F` shells out to the `clang-format` binary (same as the CLI), not clangd's built-in LSP formatter; `lsp_fallback` only fires if `clang-format` fails.
 
 ## Completion (nvim-cmp)
 

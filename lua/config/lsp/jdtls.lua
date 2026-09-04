@@ -336,12 +336,12 @@ vim.api.nvim_create_autocmd("FileType", {
 
     jdtls.start_or_attach(config)
 
-    -- Extend <A-F> for java buffers: run jdtls's custom `java/organizeImports`
+    -- Extend <leader>F for java buffers: run jdtls's custom `java/organizeImports`
     -- request, then format (conform with lsp_fallback) in the callback so the
     -- format sees the already-reorganized imports. jdtls exposes import
     -- optimization as a custom request (not the standard `source.organizeImports`
     -- code action) — see `java_action_organize_imports` in nvim-jdtls.
-    vim.keymap.set("n", "<A-F>", function()
+    vim.keymap.set("n", "<leader>F", function()
       local clients = vim.lsp.get_clients({ bufnr = 0, name = "jdtls" })
       local client = clients[1]
       if not client then
