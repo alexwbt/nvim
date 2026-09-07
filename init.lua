@@ -1,7 +1,3 @@
-vim.opt.spell = true
-vim.opt.spelllang = "en"
-vim.opt.spelloptions = "camel,noplainbuffer"
-vim.opt.spellcapcheck = ""
 vim.opt.undofile = true
 vim.opt.scrolloff = 10
 vim.opt.sidescrolloff = 10
@@ -72,7 +68,7 @@ vim.api.nvim_create_autocmd("FileType", {
 
 
 require("config.jumplist")
-require("config.project")
+require("config.project-local")
 require("config.lsp")
 require("config.lazy")
 -- plugins

@@ -1,4 +1,5 @@
 require("config.lsp.clangd")
+require("config.lsp.codebook")
 require("config.lsp.jdtls")
 require("config.lsp.lua")
 require("config.lsp.typescript")

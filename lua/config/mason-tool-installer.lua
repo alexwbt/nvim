@@ -16,6 +16,7 @@ require("mason-tool-installer").setup({
     "clangd",
     "lua-language-server",
     "typescript-language-server",
+    "codebook",
     "prettier",
     "shfmt",
   },
