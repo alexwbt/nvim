@@ -12,6 +12,19 @@ local function wpm_segment()
   return string.format("%d wpm", cur)
 end
 
+local function lsp_clients()
+  local names = {}
+  for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do
+    if client.name ~= "codebook" then
+      table.insert(names, client.name)
+    end
+  end
+  if #names == 0 then
+    return ""
+  end
+  return table.concat(names, ", ")
+end
+
 require("lualine").setup({
   options = {
     theme = "auto",
@@ -21,7 +34,7 @@ require("lualine").setup({
   },
   sections = {
     lualine_x = { "encoding", "fileformat", "filetype", wpm_segment },
-    lualine_y = { "location", "lsp_status" },
+    lualine_y = { "location", lsp_clients },
     lualine_z = { current_time },
   },
 })

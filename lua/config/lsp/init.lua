@@ -180,7 +180,7 @@ vim.api.nvim_create_user_command("LspInfo", function()
     table.insert(lines, fmt_row(row))
   end
 
-  vim.cmd.new()
+  vim.cmd("bot new")
   local buf = vim.api.nvim_get_current_buf()
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
   vim.bo[buf].buftype = "nofile"
