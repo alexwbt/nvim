@@ -179,5 +179,13 @@ vim.api.nvim_create_user_command("LspInfo", function()
   for _, row in ipairs(rows) do
     table.insert(lines, fmt_row(row))
   end
-  vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO)
+
+  vim.cmd.new()
+  local buf = vim.api.nvim_get_current_buf()
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+  vim.bo[buf].buftype = "nofile"
+  vim.bo[buf].bufhidden = "wipe"
+  vim.bo[buf].modifiable = false
+  vim.bo[buf].modified = false
+  vim.api.nvim_win_set_height(0, math.min(#lines, math.floor(vim.o.lines / 2)))
 end, {})
