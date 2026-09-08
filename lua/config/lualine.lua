@@ -14,8 +14,9 @@ end
 
 local function lsp_clients()
   local names = {}
-  for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do
-    if client.name ~= "codebook" then
+  local clients = vim.lsp.get_clients({ bufnr = 0 })
+  for _, client in ipairs(clients) do
+    if client.name ~= "codebook" or #clients == 1 then
       table.insert(names, client.name)
     end
   end
