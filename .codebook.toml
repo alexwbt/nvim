@@ -1,0 +1,26 @@
+dictionaries = [
+    "en_gb",
+    "en_us",
+]
+words = [
+    "Esc",
+    "clangd",
+    "fillchars",
+    "glsl",
+    "kanagawa",
+    "keymaps",
+    "lockb",
+    "mvnw",
+    "noh",
+    "nvim",
+    "nvmrc",
+    "pnpm",
+    "rnu",
+    "vscode",
+    "vscpp",
+    "wincmd",
+]
+ignore_patterns = [
+    'vim\..*\.\b[a-z]+\b',
+    'require\("\b.*\b"\)',
+]
