@@ -13,7 +13,3 @@ vim.keymap.set("n", "<leader>S",
 vim.keymap.set("n", "<leader>sw",
   function() spectre.open_visual({ select_word = true }) end,
   { desc = "Spectre search current word" });
-
-vim.keymap.set("n", "<leader>sf",
-  function() spectre.open_file_search({ select_word = true }) end,
-  { desc = "Spectre search on current file" });
