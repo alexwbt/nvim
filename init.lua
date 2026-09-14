@@ -45,11 +45,32 @@ vim.keymap.set("v", "<C-c>", "\"+y")
 vim.keymap.set("n", "<A-z>", "<Cmd>set wrap!<CR>", { desc = "Toggle line wrap" })
 vim.keymap.set("n", "<leader>rn", ":set rnu!<CR>", { desc = "Toggle relative line numbers" })
 vim.keymap.set("n", "<leader><Tab>", "gt", { desc = "Next tab" })
+
 vim.keymap.set("n", "<leader>`", function()
   vim.cmd.tabnew()
   vim.cmd.term()
   vim.cmd.file("term" .. "-" .. string.format("%x", math.random() * 255))
 end, { desc = "Open terminal in new tab" })
+
+vim.keymap.set("n", "<leader>bd", function()
+  local visible_buffers = {}
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    visible_buffers[buf] = true
+  end
+  local loaded_buffers = vim.api.nvim_list_bufs()
+  local deleted_count = 0
+  for _, buf in ipairs(loaded_buffers) do
+    if vim.api.nvim_buf_is_loaded(buf) and not visible_buffers[buf] then
+      local success, _ = pcall(vim.api.nvim_buf_delete, buf, { force = false })
+      if success then
+        deleted_count = deleted_count + 1
+      end
+    end
+  end
+  vim.notify(string.format("Deleted %d hidden buffer(s)", deleted_count))
+end, { desc = "Close all invisible buffers" })
+
 vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], { desc = "Escape terminal mode" })
 
 
