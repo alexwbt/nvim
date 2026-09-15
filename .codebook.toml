@@ -3,14 +3,15 @@ dictionaries = [
     "en_us",
 ]
 words = [
-    "Esc",
     "clangd",
+    "esc",
     "fillchars",
     "glsl",
     "kanagawa",
     "keymaps",
     "lockb",
     "mvnw",
+    "neodarcula",
     "noh",
     "nvim",
     "nvmrc",
@@ -23,4 +24,5 @@ words = [
 ignore_patterns = [
     'vim\..*\.\b[a-z]+\b',
     'require\("\b.*\b"\)',
+    '\b.*\b\.nvim',
 ]

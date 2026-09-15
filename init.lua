@@ -152,7 +152,7 @@ if has_root_markers(cpp_root_makers) then
 elseif has_root_markers(js_root_markers) then
   vim.cmd("colorscheme vscode")
 elseif has_root_markers(java_root_markers) then
-  vim.cmd("colorscheme jb")
+  vim.cmd("colorscheme vscode")
 else
   vim.cmd("colorscheme kanagawa-dragon")
 end
