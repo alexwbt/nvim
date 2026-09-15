@@ -5,6 +5,13 @@ return {
       group_overrides = {
         ["@attribute"] = { fg = "#4EC9B0" },
         ["@annotation"] = { fg = "#4EC9B0" },
+        ["@type.builtin"] = { fg = "#4EC9B0" },
+        ["@tag.class.css"] = { fg = "#D7BA7D" },
+        ["@lsp.type.class.css"] = { fg = "#D7BA7D" },
+        ["cssClassName"] = { fg = "#D7BA7D" },
+        ["cssClassNameDot"] = { fg = "#D7BA7D" },
+        ["@type.css"] = { fg = "#D7BA7D" },
+        ["@type.styled"] = { fg = "#D7BA7D" },
       }
     }
   },
