@@ -1,4 +1,3 @@
-
 local function current_time()
   return os.date("%I:%M:%S %p")
 end
@@ -34,6 +33,7 @@ require("lualine").setup({
     },
   },
   sections = {
+    lualine_c = { { "filename", path = 1 } },
     lualine_x = { "encoding", "fileformat", "filetype", wpm_segment },
     lualine_y = { "location", lsp_clients },
     lualine_z = { current_time },
