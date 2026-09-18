@@ -3,7 +3,9 @@ dictionaries = [
     "en_us",
 ]
 words = [
+    "breakpoint",
     "clangd",
+    "dapui",
     "esc",
     "fillchars",
     "glsl",
