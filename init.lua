@@ -45,6 +45,10 @@ vim.keymap.set("v", "<C-c>", "\"+y")
 vim.keymap.set("n", "<A-z>", "<Cmd>set wrap!<CR>", { desc = "Toggle line wrap" })
 vim.keymap.set("n", "<leader>rn", ":set rnu!<CR>", { desc = "Toggle relative line numbers" })
 vim.keymap.set("n", "<leader><Tab>", "gt", { desc = "Next tab" })
+vim.keymap.set("n", "{", "}");
+vim.keymap.set("n", "}", "{");
+vim.keymap.set("v", "{", "}");
+vim.keymap.set("v", "}", "{");
 
 vim.keymap.set("n", "<leader>`", function()
   vim.cmd.tabnew()
@@ -101,7 +105,7 @@ require("config.dap")
 require("config.fidget")
 require("config.fzf-lua")
 require("config.gitsigns")
-require("config.lsp_file_operations")
+require("config.lsp-file-operations")
 require("config.lualine")
 require("config.multicursor")
 require("config.neotree")
