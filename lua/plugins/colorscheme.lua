@@ -12,6 +12,9 @@ return {
         ["cssClassNameDot"] = { fg = "#D7BA7D" },
         ["@type.css"] = { fg = "#D7BA7D" },
         ["@type.styled"] = { fg = "#D7BA7D" },
+        ["@type.builtin.java"] = { link = "@keyword" },
+        ["@keyword.import.java"] = { link = "@keyword" },
+        ["@keyword.exception.java"] = { link = "@keyword" },
       }
     }
   },
