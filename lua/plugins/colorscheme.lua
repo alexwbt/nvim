@@ -15,6 +15,7 @@ return {
         ["@type.builtin.java"] = { link = "@keyword" },
         ["@keyword.import.java"] = { link = "@keyword" },
         ["@keyword.exception.java"] = { link = "@keyword" },
+        ["@keyword.conditional.ternary.java"] = { link = "@lsp" },
       }
     }
   },
