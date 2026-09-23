@@ -32,10 +32,10 @@ end
 
 vim.g.mapleader = " "
 
-vim.keymap.set("n", "<C-k>", "10k");
-vim.keymap.set("n", "<C-j>", "10j");
-vim.keymap.set("v", "<C-k>", "10k");
-vim.keymap.set("v", "<C-j>", "10j");
+vim.keymap.set("n", "<C-k>", "10k")
+vim.keymap.set("n", "<C-j>", "10j")
+vim.keymap.set("v", "<C-k>", "10k")
+vim.keymap.set("v", "<C-j>", "10j")
 vim.keymap.set("i", "{<CR>", "{<CR>}<Esc>O")
 vim.keymap.set("i", "{;<CR>", "{<CR>};<Esc>O")
 vim.keymap.set("n", "<Esc>", ":noh<CR>")
@@ -45,10 +45,10 @@ vim.keymap.set("v", "<C-c>", "\"+y")
 vim.keymap.set("n", "<A-z>", "<Cmd>set wrap!<CR>", { desc = "Toggle line wrap" })
 vim.keymap.set("n", "<leader>rn", ":set rnu!<CR>", { desc = "Toggle relative line numbers" })
 vim.keymap.set("n", "<leader><Tab>", "gt", { desc = "Next tab" })
-vim.keymap.set("n", "{", "}");
-vim.keymap.set("n", "}", "{");
-vim.keymap.set("v", "{", "}");
-vim.keymap.set("v", "}", "{");
+vim.keymap.set("n", "{", "}")
+vim.keymap.set("n", "}", "{")
+vim.keymap.set("v", "{", "}")
+vim.keymap.set("v", "}", "{")
 
 vim.keymap.set("n", "<leader>`", function()
   vim.cmd.tabnew()
@@ -99,6 +99,7 @@ require("config.lazy")
 -- plugins
 require("config.abolish")
 require("config.autotag")
+require("config.minuet")
 require("config.cmp")
 require("config.conform")
 require("config.dap")

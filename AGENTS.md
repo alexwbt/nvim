@@ -95,7 +95,7 @@ mason prepends `<data>/mason/bin/` to `PATH` only within Neovim-spawned jobs (LS
 
 ## Completion (nvim-cmp)
 
-Sources: `nvim_lsp`, `buffer`, `path`. `lspkind.nvim` renders the menu (`mode = "symbol_text"`, `maxwidth = 50`). Keys: `<C-Space>` complete, `<CR>` confirm (`select = true`), `<Tab>`/`<S-Tab>` next/prev item, `<C-e>` abort. No `<C-n>` mapping — don't assume one.
+Sources: `nvim_lsp`, `buffer`, `path` — **not** `minuet`. Minuet is invoked exclusively via the insert-mode `<leader>.` keymap (see Minuet section below); it isn't part of the normal cmp sources list. `lspkind.nvim` renders the menu (`mode = "symbol_text"`, `maxwidth = 50`). Keys: `<C-Space>` complete, `<CR>` confirm (`select = true`), `<Tab>`/`<S-Tab>` next/prev item, `<C-e>` abort. No `<C-n>` mapping — don't assume one.
 
 ## Other plugin conventions / quirks
 
@@ -116,4 +116,9 @@ Sources: `nvim_lsp`, `buffer`, `path`. `lspkind.nvim` renders the menu (`mode = 
 - `lualine.nvim` (statusline, `event = "VeryLazy"`): `theme = "auto"` (follows the conditional colorscheme), `lualine_z` = current time, `lualine_y` = `{ "location", "lsp_status" }`. Dep `nvim-web-devicons`.
 - gitsigns: `current_line_blame` on, `virt_text_pos = "eol"`, `delay = 500`.
 - fidget.nvim: `event = "LspAttach"`, `opts = {}` (LSP progress notifications).
+- **Minuet** (`milanglacier/minuet-ai.nvim`, OpenAI-compatible LLM completion as a `nvim-cmp` source). Insert-mode `<leader>.` triggers cmp with **only** the minuet source (`require("minuet").make_cmp_map()` — other sources are not queried, so it's a deliberate LLM-only fetch). `<C-Space>` still hits every source (incl. minuet) if you want it. Config lives in `stdpath('data') .. "/minuet.json"` (outside the dotfiles repo — keeps the literal API key out of git). `:MinuetConfig` opens it; the data dir is created on first read if missing. Schema: any table accepted by `require("minuet").setup` (provider, provider_options, etc.). Two key fields per provider, both get wrapped into a function by `lua/config/minuet.lua` so minuet sees a callable `api_key`:
+  - `api_key` — **literal** string (e.g. `"sk-..."`). Use this; the literal key is the point of having a JSON file.
+  - `api_key_env` — env var **name** (e.g. `"OPENAI_API_KEY"`); converted to a function that reads it via `os.getenv`. Use this instead if you'd rather keep the key out of the file.
+  - If both are set, `api_key` (literal) wins; `api_key_env` is the fallback.
+  `:MinuetConfig` writes a starter JSON template the first time it runs (only if the file is missing — won't overwrite an existing one). The data dir is created on first read if missing. `curl` (on MSYS2 PATH) does the HTTP. **`config.minuet` must load before `config.cmp`** — minuet registers itself as the `minuet` cmp source inside `setup()`, so calling `cmp.setup()` first would silently miss the source. Plugin spec declares `nvim-cmp` as a dependency for that reason.
 - `config.project-local` (project-config hook): walks up from cwd for a project root (only `.git` or `.nvim`); if `<projectRoot>/.nvim/init.lua` exists it is `dofile`d (protected — a broken file warns, never breaks startup); this is the hook for a repo to register its own DAP configs / keymaps / commands / set `vim.g.jdtls_formatter` / `vim.g.jdtls_settings` without touching the global config. Persistent undo lives in the default central `stdpath('state')/undo` (`undofile` is on, no custom `undodir`).
