@@ -44,7 +44,7 @@ plugin (`lua/plugins/jdtls.lua`).
 | Lombok jar (optional)              | Java      | auto-discovered from Maven/Gradle caches                                                                                                                                                                                                                                    |
 | java-debug `/` java-test bundles   | Java      | installed via **mason-tool-installer** (`java-debug-adapter`, `java-test` → `<data>/mason/share`), or manually at `<jdtls-home>/java-debug` + `<jdtls-home>/vscode-java-test`, `stdpath('cache')/java-debug`, or `~/.debug-plugins` — enables Java DAP + JUnit test running |
 
-mason-tool-installer auto-installs `clangd`/`lua-language-server`/`typescript-language-server`
+mason-tool-installer auto-installs `clangd`/`lua-language-server`/`typescript-language-server`/`codebook`
 on first launch (see the mason note below); they're then available to nvim only.
 Missing `jdtls`/`java` only warns on first `.java` open. Without the
 java-debug/vscode-java-test bundles the Java LSP still works, but Java DAP and
@@ -54,13 +54,16 @@ test running are silently disabled.
 
 Configured in `lua/config/conform.lua`. Triggered by `<leader>F` in normal mode.
 
-| Binary     | Filetypes                                                      |
-| ---------- | -------------------------------------------------------------- |
-| `prettier` | js, ts, jsx, tsx, json, jsonc, html, css, scss, yaml, markdown |
-| `shfmt`    | sh, bash, zsh                                                  |
+| Binary         | Filetypes                                                      |
+| -------------- | -------------------------------------------------------------- |
+| `prettier`     | js, ts, jsx, tsx, json, jsonc, html, css, scss, yaml, markdown |
+| `shfmt`        | sh, bash, zsh                                                  |
+| `clang-format` | c, cpp, glsl                                                   |
 
 `prettier` and `shfmt` are mason-tool-installer-managed (`ensure_installed`).
-`prettier` implies `node` on PATH.
+`prettier` implies `node` on PATH. `clang-format` is **not** mason-managed — it
+must be on the MSYS2 PATH (clang toolchain); for C/C++ `<leader>F` shells out to
+the `clang-format` binary rather than clangd's built-in formatter.
 
 ### Debugger (nvim-dap)
 
@@ -88,7 +91,7 @@ tests. See `lua/config/dap.lua`.
 `ensure_installed`. The auto-install list lives in
 **mason-tool-installer.nvim** (`lua/config/mason-tool-installer.lua`, separate
 `lazy = false` plugin), which installs `clangd`, `lua-language-server`,
-`typescript-language-server`, `prettier`, `shfmt`, and the
+`typescript-language-server`, `codebook`, `prettier`, `shfmt`, and the
 `java-debug-adapter` / `java-test` bundles into `<data>/mason/` on startup
 (`run_on_start = true`, `start_delay = 3000`). mason prepends
 `<data>/mason/bin/` to `PATH` only inside Neovim-spawned jobs (LSPs, conform,
