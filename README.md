@@ -14,6 +14,54 @@ no-op — the native shell/PATH apply. `vim.g.is_windows` is set in that same
 block and is the global flag for "current env is Windows"; prefer it over
 repeated `vim.fn.has("win32")` calls.
 
+## Manual setup (not automated)
+
+Most tooling (clangd, lua-language-server, typescript-language-server, codebook,
+prettier, shfmt, java-debug/java-test bundles) is auto-installed by
+**mason-tool-installer** on first launch, and plugins/treesitter install via
+`:Lazy`/`:TSUpdate`. The following must be set up by hand:
+
+### 1. System packages (your OS package manager, not nvim/mason)
+
+These are binaries that must be findable on the PATH. mason only ships
+LSP/formatter/linter/DAP tools, so these are not auto-installed:
+
+- `bash` — on Windows only (`&shell` is forced to bash)
+- `gcc`, `make`, `tree-sitter` — build toolchain, needed only at install time
+- `node` + `prettier` — prettier; `node` also runs typescript-language-server
+- `shfmt` — shell formatter
+- `clang-format` — C/C++ formatter
+- `rg` — telescope/fzf-lua live grep
+- `fzf` — fzf-lua live grep (`<leader>fg`)
+- `zoxide` — `<leader>cd` (telescope-zoxide)
+- `gdb` — C/C++ DAP
+- `curl` — minuet LLM HTTP requests
+
+### 2. minuet LLM API key
+
+`minuet` (AI completion) reads its config from `stdpath('data')/minuet.json`
+(`:MinuetConfig` writes a starter template on first run). You must add the
+`api_key` (literal key) or `api_key_env` (env var name). This is the one secret
+that must come from you — it cannot be auto-installed.
+
+### 3. Java (only if you work with Java)
+
+- **Java >= 21 runtime** — via `$JAVA_HOME` or `java` on PATH.
+- **jdtls install** — place at `$JDTLS_HOME`, or a `jdtls`/`jdtls.bat` shim
+  on PATH, or a probed common dir. Not auto-installed by mason.
+- **Lombok** (optional) — auto-discovered from Maven/Gradle caches; nothing to do.
+
+The java-debug/java-test bundles for DAP + test running **are** auto-installed by
+mason; without them the Java LSP still works but debugging/tests are disabled.
+
+### 4. First-launch steps in nvim
+
+1. `:Lazy` → wait for installs to finish.
+2. `:TSUpdate` → install + compile treesitter parsers.
+3. If `find_files`/`live_grep` feel slow on Windows, verify
+   `<data>/lazy/telescope-fzf-native.nvim/build/libfzf.dll` exists, else run
+   `:Lazy build telescope-fzf-native` (or `make` by hand in that directory).
+
 ## External dependencies
 
 These must be findable on the PATH at runtime.
