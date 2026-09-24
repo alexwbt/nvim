@@ -165,6 +165,7 @@ with your system package manager.
 Leader is space. The full reference lives in `lua/config/*.lua` and `init.lua`.
 
 - `-` — Oil (open parent dir as buffer). `<leader>e` — Neo-tree toggle.
+- `:GD [args]` `:GDF` `:GDH` — Diffview (open with args, current-file history, full repo history).
 - `<leader>ff` `<leader>fo` `<leader>fg` `<leader>fr` `<leader>fd` `<leader>fi` `<leader>fb` `<leader>fh` `<leader>fc` — Telescope (files, oldfiles, live grep, LSP refs/defs/impls, buffers, help, colorscheme). `<leader>fg` (live grep) is routed to **fzf-lua** instead of telescope — it streams `rg` once and prunes on backspace instead of re-spawning per keystroke (avoids the telescope `live_grep` freeze on Windows). Requires the `fzf` binary on PATH (install with your system package manager). `<leader>cd` — zoxide.
 - `<C-j>` / `<C-k>` — jump 10 lines (normal + visual). `<M-j>` / `<M-k>` — move line/block up/down with reindent. `<A-z>` — toggle word wrap. `<leader>o` / `<leader>i` — prev / next file in the jumplist. `<leader>;` — Snacks dashboard.
 - `<leader>F` — format buffer (conform, `lsp_fallback = true`). `<F2>` — LSP rename. `[d` / `]d` — prev / next diagnostic. `<leader><space>` — LSP code action.
