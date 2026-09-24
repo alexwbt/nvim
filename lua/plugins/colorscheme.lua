@@ -3,6 +3,7 @@ return {
     "mofiqul/vscode.nvim",
     opts = {
       group_overrides = {
+        ["SpecialChar"] = { link = "Special" },
         ["@attribute"] = { fg = "#4EC9B0" },
         ["@annotation"] = { fg = "#4EC9B0" },
         ["@type.builtin"] = { fg = "#4EC9B0" },
