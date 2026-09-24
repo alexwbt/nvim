@@ -38,7 +38,6 @@ local function find_jdtls_home()
     vim.fn.stdpath("data") .. "/jdtls",
     vim.env.HOME .. "/opt/jdtls",
     "/opt/jdtls",
-    "C:/msys64/opt/jdtls",
   }
   return find_dir(home_dirs, "plugins")
 end

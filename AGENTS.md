@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Neovim configuration repo (Windows + MSYS2). Managed by [lazy.nvim](https://github.com/folke/lazy.nvim). No build/test/lint/CI — validation = launching Neovim and exercising the affected keymap/feature.
+Neovim configuration repo (platform-conditional: works on Windows and Unix; the only Windows-specific behavior activates when `has('win32')`/`has('win64')`). Managed by [lazy.nvim](https://github.com/folke/lazy.nvim). No build/test/lint/CI — validation = launching Neovim and exercising the affected keymap/feature.
 
 ## Entry point & load order
 
@@ -23,9 +23,9 @@ Neovim configuration repo (Windows + MSYS2). Managed by [lazy.nvim](https://gith
 
 ## fzf-lua vs telescope (live grep)
 
-Telescope's `live_grep` re-spawns `rg` on every keystroke (including backspace) — no result caching, no way to abort an in-flight job from the UI. On Windows/MSYS2 the per-spawn cost is high enough that correcting a typo freezes the picker. `telescope-fzf-native` only swaps the in-memory fuzzy-sort algorithm (uses `libfzf.dll`, not the `fzf` binary); it does NOT fix the re-spawn.
+Telescope's `live_grep` re-spawns `rg` on every keystroke (including backspace) — no result caching, no way to abort an in-flight job from the UI. On Windows the per-spawn cost is high enough that correcting a typo freezes the picker. `telescope-fzf-native` only swaps the in-memory fuzzy-sort algorithm (uses `libfzf.dll`, not the `fzf` binary); it does NOT fix the re-spawn.
 
-`fzf-lua` (`lua/plugins/fzf-lua.lua` + `lua/config/fzf-lua.lua`) streams `rg` output once and prunes on backspace instead of re-spawning. Only `<leader>fg` is routed to `fzf-lua.live_grep`; every other picker still uses telescope. Requires the `fzf` binary on PATH — NOT a mason package (mason only ships LSP/formatter/linter/DAP tools), install via `pacman -S mingw-w64-ucrt-x86_64-fzf`. `rg` (already on PATH for telescope) is reused. Window is near-fullscreen (`width = 0.99`, `height = 0.99`) with a horizontal right-side preview (`winopts.preview.layout = "horizontal"`, `horizontal = "right:40%"`) to match telescope's layout. `file_ignore_patterns` mirrors telescope's (`^%.git`, `^%.vs`, `^%.idea` — anchored so only paths actually starting with `.git`/`.vs`/`.idea` are filtered; without `^`, `%.git` would also match e.g. `proj.git/file`); rg's built-in `.gitignore` respect handles the rest. `<C-s>` inside the fzf-lua grep window opens Spectre with the current query (`spectre.open({ search_text = ... })`).
+`fzf-lua` (`lua/plugins/fzf-lua.lua` + `lua/config/fzf-lua.lua`) streams `rg` output once and prunes on backspace instead of re-spawning. Only `<leader>fg` is routed to `fzf-lua.live_grep`; every other picker still uses telescope. Requires the `fzf` binary on PATH — NOT a mason package (mason only ships LSP/formatter/linter/DAP tools), install it with your system package manager. `rg` (already on PATH for telescope) is reused. Window is near-fullscreen (`width = 0.99`, `height = 0.99`) with a horizontal right-side preview (`winopts.preview.layout = "horizontal"`, `horizontal = "right:40%"`) to match telescope's layout. `file_ignore_patterns` mirrors telescope's (`^%.git`, `^%.vs`, `^%.idea` — anchored so only paths actually starting with `.git`/`.vs`/`.idea` are filtered; without `^`, `%.git` would also match e.g. `proj.git/file`); rg's built-in `.gitignore` respect handles the rest. `<C-s>` inside the fzf-lua grep window opens Spectre with the current query (`spectre.open({ search_text = ... })`).
 
 ## Colorscheme (conditional, must stay last)
 
@@ -38,9 +38,9 @@ Telescope's `live_grep` re-spawns `rg` on every keystroke (including backspace) 
 
 Installed colorschemes (from `lua/plugins/colorscheme.lua`): vscode (with `group_overrides` for Java/CSS highlight groups), onedarkpro, github, kanagawa, gruvbox, tokyonight, monokai-pro, jb, neodarcula. `<leader>fc` previews all of them.
 
-## Platform: Windows + MSYS2
+## Platform: Windows + Unix
 
-`init.lua` forces the shell to MSYS2 bash when `has("win32")`/`has("win64")`:
+`init.lua` forces the shell to bash when `has("win32")`/`has("win64")`:
 
 ```
 vim.g.is_windows = true
@@ -53,7 +53,7 @@ vim.opt.shellslash = true
 
 `vim.g.is_windows` is the global flag for "current env is Windows" — prefer checking `vim.g.is_windows` over repeated `vim.fn.has("win32")` calls (e.g. `lua/config/telescope.lua` uses it for the `filename_first` backslash-normalization workaround).
 
-So `:!cmd`, terminal jobs, conform formatters, and LSP spawns inherit a Unix-like PATH (git, `make`, compilers, node). Do NOT "fix" this back to `cmd.exe`/powershell — `telescope-fzf-native.nvim` (`build = 'make'`) and treesitter parsers rely on it.
+So on Windows, `:!cmd`, terminal jobs, conform formatters, and LSP spawns inherit a Unix-like PATH (git, `make`, compilers, node). On Unix this block is not entered — the native shell applies. Do NOT "fix" the Windows shell back to `cmd.exe`/powershell — `telescope-fzf-native.nvim` (`build = 'make'`) and treesitter parsers rely on it.
 
 ## Leader key
 
@@ -64,7 +64,7 @@ So `:!cmd`, terminal jobs, conform formatters, and LSP spawns inherit a Unix-lik
 1. Launch Neovim — lazy clones itself into `stdpath('data')/lazy/lazy.nvim`.
 2. `:Lazy` → wait for installs.
 3. `:TSUpdate` — installs + compiles tree-sitter parsers via the `tree-sitter` CLI (must be on PATH; `nvim-treesitter` has `build = ":TSUpdate"`, `lazy = false`). Parser set is declared explicitly in `lua/config/treesitter.lua` via `ts.install(...)`.
-4. `:Lazy build telescope-fzf-native` — runs `make`; needs `gcc` + `make` on PATH (MSYS2 `gcc`). Auto-build can silently no-op on Windows (MSYS2 build PATH isn't inherited into lazy's build job), so if `find_files`/`live_grep` feel slow, check `<data>/lazy/telescope-fzf-native.nvim/build/libfzf.dll` exists and run `make` by hand if not. `fzf` + `zoxide` are loaded as Telescope extensions.
+4. `:Lazy build telescope-fzf-native` — runs `make`; needs `gcc` + `make` on PATH. Auto-build can silently no-op on Windows (the build PATH isn't inherited into lazy's build job), so if `find_files`/`live_grep` feel slow, check `<data>/lazy/telescope-fzf-native.nvim/build/libfzf.dll` exists and run `make` by hand if not. `fzf` + `zoxide` are loaded as Telescope extensions.
 
 ## LSPs
 
@@ -74,7 +74,7 @@ Configured in `lua/config/lsp/*.lua` via `vim.lsp.config` + `vim.lsp.enable`, re
 - `lua_ls` — `lua`, `root_markers = {'.git','.luarc.json'}`, `vim` declared as a global.
 - `ts_ls` — JS/TS, `root_markers = {tsconfig.json, jsconfig.json, package.json, .git}`; on Windows the binary is `typescript-language-server.cmd` (chosen via `jit.os`).
 - `codebook` — spell checker for code (comments, strings, and identifiers at their definitions). No `filetypes` filter → attaches to every buffer; on Windows the binary is `codebook-lsp.cmd`. `root_markers = {'.git', 'codebook.toml', '.codebook.toml'}`. Dictionary words added via code action go to `<root>/codebook.toml` (project) or `%APPDATA%/codebook/codebook.toml` (global). Replaces both harper (removed) and native `spell` (also removed).
-- `jdtls` — `java`, started by the **`nvim-jdtls`** plugin (`lua/plugins/jdtls.lua`, `ft = "java"`), **deferred**: `lua/config/lsp/jdtls.lua` registers a `FileType java` autocmd that calls `require("jdtls").start_or_attach()` (idempotent per buffer), not at startup. The plain `vim.lsp.config`/`vim.lsp.enable` path is NOT used. Discovery: Java runtime (`$JAVA_HOME` or `java` on PATH; jdtls needs >= 21) and a jdtls install (`$JDTLS_HOME`, or `jdtls`/`jdtls.bat` shim on PATH, or probed common dirs incl. `C:/msys64/opt/jdtls`). Lombok is auto-discovered from Maven/Gradle caches. Per-project workspace cache lives under `stdpath('cache')/jdtls/workspace/<sha256-hash>`; `:JdtlsCleanWorkspace` wipes it (run then restart Neovim when indexes go stale). Per-project Eclipse formatter XML resolved in priority order: `vim.g.jdtls_formatter` → `$JDTLS_FORMATTER` → `<root>/jdt-formatter.xml`. Per-project JDT compiler `.prefs` via: `vim.g.jdtls_settings` → `$JDTLS_SETTINGS` → `<root>/.jdt-settings/org.eclipse.jdt.core.prefs`. `autobuild.enabled = false` — build with `./mvnw` yourself (jdtls's embedded JDT compiler can emit a classfile version the Java-21 runtime can't load). For `java` buffers only, `<leader>F` is remapped (buffer-local) to run jdtls's `java/organizeImports` custom request, then conform-format in the callback.
+- `jdtls` — `java`, started by the **`nvim-jdtls`** plugin (`lua/plugins/jdtls.lua`, `ft = "java"`), **deferred**: `lua/config/lsp/jdtls.lua` registers a `FileType java` autocmd that calls `require("jdtls").start_or_attach()` (idempotent per buffer), not at startup. The plain `vim.lsp.config`/`vim.lsp.enable` path is NOT used. Discovery: Java runtime (`$JAVA_HOME` or `java` on PATH; jdtls needs >= 21) and a jdtls install (`$JDTLS_HOME`, or `jdtls`/`jdtls.bat` shim on PATH, or probed common dirs). Lombok is auto-discovered from Maven/Gradle caches. Per-project workspace cache lives under `stdpath('cache')/jdtls/workspace/<sha256-hash>`; `:JdtlsCleanWorkspace` wipes it (run then restart Neovim when indexes go stale). Per-project Eclipse formatter XML resolved in priority order: `vim.g.jdtls_formatter` → `$JDTLS_FORMATTER` → `<root>/jdt-formatter.xml`. Per-project JDT compiler `.prefs` via: `vim.g.jdtls_settings` → `$JDTLS_SETTINGS` → `<root>/.jdt-settings/org.eclipse.jdt.core.prefs`. `autobuild.enabled = false` — build with `./mvnw` yourself (jdtls's embedded JDT compiler can emit a classfile version the Java-21 runtime can't load). For `java` buffers only, `<leader>F` is remapped (buffer-local) to run jdtls's `java/organizeImports` custom request, then conform-format in the callback.
   - **Java DAP + tests require the java-debug / vscode-java-test bundles**. `find_debug_bundles()` resolves them, searching in order: `<jdtls-home>/java-debug` (+ `<jdtls-home>/vscode-java-test`), `stdpath('cache')/java-debug` (+ `.../vscode-java-test`), `~/.debug-plugins`, then mason-managed `<data>/mason/share/java-debug-adapter` (+ `.../java-test`). When found they're passed via `init_options.bundles`; nvim-jdtls then auto-registers the `java` DAP adapter (needs nvim-dap as a dependency — declared on the jdtls plugin spec) and `:DapNew` auto-discovers main classes / JUnit tests. `vim.g.jdtls_debug_bundles` exposes whether they were found. Missing bundles => LSP still works, DAP/tests silently disabled.
 
 ### mason.nvim + mason-tool-installer.nvim
@@ -92,7 +92,7 @@ mason prepends `<data>/mason/bin/` to `PATH` only within Neovim-spawned jobs (LS
 ## Formatting (conform.nvim)
 
 - `<leader>F` (normal) formats with `lsp_fallback = true`, `async = true`.
-- `formatters_by_ft` (in `lua/config/conform.lua`): `prettier` for js/ts/jsx/tsx/json/jsonc/html/css/scss/yaml/markdown; `shfmt` for sh/bash/zsh; `clang-format` for c/cpp/glsl. Binaries must be on PATH (node/prettier, shfmt, clang-format) via the MSYS2 shell PATH. For C/C++, `<leader>F` shells out to the `clang-format` binary (same as the CLI), not clangd's built-in LSP formatter; `lsp_fallback` only fires if `clang-format` fails.
+- `formatters_by_ft` (in `lua/config/conform.lua`): `prettier` for js/ts/jsx/tsx/json/jsonc/html/css/scss/yaml/markdown; `shfmt` for sh/bash/zsh; `clang-format` for c/cpp/glsl. Binaries must be on PATH (node/prettier, shfmt, clang-format). For C/C++, `<leader>F` shells out to the `clang-format` binary (same as the CLI), not clangd's built-in LSP formatter; `lsp_fallback` only fires if `clang-format` fails.
 
 ## Completion (nvim-cmp)
 
@@ -125,5 +125,5 @@ Sources: `nvim_lsp`, `buffer`, `path` — **not** `minuet`. Minuet is invoked ex
   - `api_key` — **literal** string (e.g. `"sk-..."`). Use this; the literal key is the point of having a JSON file.
   - `api_key_env` — env var **name** (e.g. `"OPENAI_API_KEY"`); converted to a function that reads it via `os.getenv`. Use this instead if you'd rather keep the key out of the file.
   - If both are set, `api_key` (literal) wins; `api_key_env` is the fallback.
-  `curl` (on MSYS2 PATH) does the HTTP. Plugin spec declares `nvim-cmp` as a dependency; `config.minuet` is required from `init.lua` before `config.cmp` (see load order).
+  `curl` does the HTTP. Plugin spec declares `nvim-cmp` as a dependency; `config.minuet` is required from `init.lua` before `config.cmp` (see load order).
 - `config.project-local` (project-config hook): walks up from cwd for a project root (only `.git` or `.nvim`); if `<projectRoot>/.nvim/init.lua` exists it is `dofile`d (protected — a broken file warns, never breaks startup); this is the hook for a repo to register its own DAP configs / keymaps / commands / set `vim.g.jdtls_formatter` / `vim.g.jdtls_settings` without touching the global config. Persistent undo lives in the default central `stdpath('state')/undo` (`undofile` is on, no custom `undodir`).

@@ -3,13 +3,16 @@
 Neovim configuration managed by [lazy.nvim](https://github.com/folke/lazy.nvim).
 See `AGENTS.md` for the full architecture / conventions write-up.
 
-## Windows note
+## Platform note
 
-On Windows, `init.lua` forces `&shell = "bash"` with Unix-style flags, so every
-external program (`:!`, conform, LSPs) is resolved against the bash PATH, not
-`cmd.exe`/PowerShell. On Linux this is a no-op — the native shell/PATH apply.
-`vim.g.is_windows` is set in that same block and is the global flag for "current
-env is Windows"; prefer it over repeated `vim.fn.has("win32")` calls.
+The config is platform-conditional, not platform-locked: everything below
+describes external dependencies that must be findable on the PATH at runtime
+(install them with your normal package manager). On Windows, `init.lua` forces
+`&shell = "bash"` with Unix-style flags, so every external program (`:!`,
+conform, LSPs) is resolved against the bash PATH; on Linux/macOS this is a
+no-op — the native shell/PATH apply. `vim.g.is_windows` is set in that same
+block and is the global flag for "current env is Windows"; prefer it over
+repeated `vim.fn.has("win32")` calls.
 
 ## External dependencies
 
@@ -62,7 +65,7 @@ Configured in `lua/config/conform.lua`. Triggered by `<leader>F` in normal mode.
 
 `prettier` and `shfmt` are mason-tool-installer-managed (`ensure_installed`).
 `prettier` implies `node` on PATH. `clang-format` is **not** mason-managed — it
-must be on the MSYS2 PATH (clang toolchain); for C/C++ `<leader>F` shells out to
+must be on the PATH (from the clang toolchain); for C/C++ `<leader>F` shells out to
 the `clang-format` binary rather than clangd's built-in formatter.
 
 ### Debugger (nvim-dap)
@@ -82,7 +85,7 @@ tests. See `lua/config/dap.lua`.
 | -------- | ----------------------------------------- |
 | `node`   | prettier + typescript-language-server     |
 | `rg`     | telescope `live_grep`/`grep_string` + fzf-lua `live_grep` (reused, not re-spawned by fzf-lua) |
-| `fzf`    | fzf-lua `live_grep` (`<leader>fg`); NOT a mason package — install via `pacman -S mingw-w64-ucrt-x86_64-fzf` |
+| `fzf`    | fzf-lua `live_grep` (`<leader>fg`); NOT a mason package — install it with your system package manager |
 | `zoxide` | `<leader>cd` (telescope-zoxide extension) |
 
 ### mason.nvim + mason-tool-installer.nvim
@@ -95,26 +98,26 @@ tests. See `lua/config/dap.lua`.
 `java-debug-adapter` / `java-test` bundles into `<data>/mason/` on startup
 (`run_on_start = true`, `start_delay = 3000`). mason prepends
 `<data>/mason/bin/` to `PATH` only inside Neovim-spawned jobs (LSPs, conform,
-`:!`), so these binaries are available to nvim but **not** to a plain bash
+`:!`), so these binaries are available to nvim but **not** to a plain
 shell or other editors. To use them outside nvim, install the system package
-(e.g. `pacman -S mingw-w64-x86_64-clangd`) instead and remove the entry from
-`ensure_installed`. `:Mason` lists installed packages; `:MasonInstall <pkg>` /
-`:MasonUpdate` manage them. `fzf` is **not** a mason package (mason only ships
-LSP/formatter/linter/DAP tools) — install it via the MSYS2 package above.
+yourself and remove the entry from `ensure_installed`. `:Mason` lists installed
+packages; `:MasonInstall <pkg>` / `:MasonUpdate` manage them. `fzf` is **not** a
+mason package (mason only ships LSP/formatter/linter/DAP tools) — install it
+with your system package manager.
 
 ## Post-install
 
 1. Launch Neovim — lazy clones itself into `stdpath('data')/lazy/lazy.nvim`.
 2. `:Lazy` → wait for installs to finish.
 3. `:TSUpdate` — installs + compiles tree-sitter parsers (requires the `tree-sitter` CLI on PATH).
-4. `:Lazy build telescope-fzf-native` — runs `make` (needs `gcc` + `make`). If find_files/live_grep feel slow and `<data>/lazy/telescope-fzf-native.nvim/build/libfzf.dll` is missing (the MSYS2 build can silently no-op), run `make` by hand inside that plugin directory. Both `fzf` and `zoxide` are loaded as Telescope extensions.
+4. `:Lazy build telescope-fzf-native` — runs `make` (needs `gcc` + `make`). If find_files/live_grep feel slow and `<data>/lazy/telescope-fzf-native.nvim/build/libfzf.dll` is missing (the Windows build can silently no-op), run `make` by hand inside that plugin directory. Both `fzf` and `zoxide` are loaded as Telescope extensions.
 
 ## Keymaps & commands
 
 Leader is space. The full reference lives in `lua/config/*.lua` and `init.lua`.
 
 - `-` — Oil (open parent dir as buffer). `<leader>e` — Neo-tree toggle.
-- `<leader>ff` `<leader>fo` `<leader>fg` `<leader>fr` `<leader>fd` `<leader>fi` `<leader>fb` `<leader>fh` `<leader>fc` — Telescope (files, oldfiles, live grep, LSP refs/defs/impls, buffers, help, colorscheme). `<leader>fg` (live grep) is routed to **fzf-lua** instead of telescope — it streams `rg` once and prunes on backspace instead of re-spawning per keystroke (avoids the telescope `live_grep` freeze on Windows/MSYS2). Requires the `fzf` binary on PATH (MSYS2: `pacman -S mingw-w64-ucrt-x86_64-fzf`). `<leader>cd` — zoxide.
+- `<leader>ff` `<leader>fo` `<leader>fg` `<leader>fr` `<leader>fd` `<leader>fi` `<leader>fb` `<leader>fh` `<leader>fc` — Telescope (files, oldfiles, live grep, LSP refs/defs/impls, buffers, help, colorscheme). `<leader>fg` (live grep) is routed to **fzf-lua** instead of telescope — it streams `rg` once and prunes on backspace instead of re-spawning per keystroke (avoids the telescope `live_grep` freeze on Windows). Requires the `fzf` binary on PATH (install with your system package manager). `<leader>cd` — zoxide.
 - `<C-j>` / `<C-k>` — jump 10 lines (normal + visual). `<M-j>` / `<M-k>` — move line/block up/down with reindent. `<A-z>` — toggle word wrap. `<leader>o` / `<leader>i` — prev / next file in the jumplist. `<leader>;` — Snacks dashboard.
 - `<leader>F` — format buffer (conform, `lsp_fallback = true`). `<F2>` — LSP rename. `[d` / `]d` — prev / next diagnostic. `<leader><space>` — LSP code action.
 - `<F5>`/`<F6>`/`<F7>`/`<F8>`/`<F9>`/`<F10>` — DAP continue / step over / step into / step out / toggle breakpoint / restart. `<S-F5>` or `<F17>` — terminate. `<leader>dr` REPL, `<leader>du` dap-ui toggle, `<leader>ds` sessions sidebar. `:ClearBreakpoints`.

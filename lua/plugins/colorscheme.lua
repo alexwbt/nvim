@@ -16,6 +16,10 @@ return {
         ["@keyword.import.java"] = { link = "@keyword" },
         ["@keyword.exception.java"] = { link = "@keyword" },
         ["@keyword.conditional.ternary.java"] = { link = "@lsp" },
+        ["SnacksDashboardDesc"] = { fg = "#4DAAFC" },
+        ["SnacksDashboardIcon"] = { fg = "#4DAAFC" },
+        ["SnacksDashboardKey"] = { fg = "#DDDDDD" },
+        ["SnacksDashboardFooter"] = { fg = "#DDDDDD" },
       }
     }
   },

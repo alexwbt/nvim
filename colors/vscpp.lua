@@ -411,6 +411,12 @@ function M.load()
   hl("GitSignsDeleteLn", { fg = C.error })
   hl("GitSignsCurrentLineBlame", { fg = C.fg_dim })
 
+  -- snacks dashboard
+  hl("SnacksDashboardKey", { fg = C.fg_dim })
+  hl("SnacksDashboardIcon", { fg = C.keyword })
+  hl("SnacksDashboardDesc", { fg = C.keyword })
+  hl("SnacksDashboardFooter", { fg = C.fg })
+
   -- Indent blankline / indent guides if ever added.
   hl("IndentBlanklineChar", { fg = C.border })
   hl("IndentBlanklineContextChar", { fg = C.keyword })
