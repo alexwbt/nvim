@@ -10,7 +10,7 @@ Neovim configuration repo (platform-conditional: works on Windows and Unix; the 
 2. `config.lazy` (bootstraps lazy.nvim, auto-imports everything under `lua/plugins/`).
 3. Plugin configs, in this exact order: `config.abolish` → `config.autotag` → `config.minuet` → `config.cmp` → `config.conform` → `config.dap` → `config.diffview` → `config.fidget` → `config.fzf-lua` → `config.gitsigns` → `config.lsp-file-operations` → `config.lualine` → `config.multicursor` → `config.neotree` → `config.oil` → `config.spectre` → `config.telescope` → `config.treesitter` → `config.wpm`. **`config.minuet` must load before `config.cmp`** — minuet registers itself as the `minuet` cmp source inside `setup()`.
 4. `config.snacks` and `config.live-preview` are NOT required from `init.lua` — each runs in the `config =` callback of its plugin spec (`lua/plugins/snacks.lua` is `lazy = false`, `priority = 1000`; `lua/plugins/live-preview.lua` is `cmd = "LivePreview"`, `ft = markdown/html/asciidoc/svg`).
-5. Colorscheme (conditional, last — reads `getcwd()` markers, see below).
+5. Colorscheme (conditional, last — evaluates `getcwd()` markers, see below). Sets a default colorscheme, then registers a `DirChanged` autocmd that re-evaluates on directory change.
 
 ## Layout
 
@@ -29,12 +29,14 @@ Telescope's `live_grep` re-spawns `rg` on every keystroke (including backspace) 
 
 ## Colorscheme (conditional, must stay last)
 
-`init.lua` picks a colorscheme based on `getcwd()` markers (falling back to `kanagawa-dragon` when none match):
+`init.lua` sets `colorscheme kanagawa-dragon` as the default, then registers a `DirChanged` autocmd whose callback re-evaluates the colorscheme from `getcwd()` markers on every directory change (falling back to `kanagawa-dragon` when none match):
 
 - C++ root (`CMakeLists.txt`, `.clangd`, `.clang-format`, `.clang-tidy`) → `colorscheme vscpp` (the hand-rolled `colors/vscpp.lua`).
 - JS root (`package.json`, `tsconfig.json`, `jsconfig.json`, `node_modules`, `yarn.lock`, `pnpm-lock.yaml`, `package-lock.json`, `bun.lockb`, `.nvmrc`) → `colorscheme vscode`.
 - Java root (`pom.xml`, `mvnw`, `mvnw.cmd`) → `colorscheme vscode` (NOT `jb`).
 - No match → `colorscheme kanagawa-dragon`.
+
+The same `DirChanged` callback also stops any active LSP client whose `root_dir` no longer contains the new cwd (i.e. clients rooted outside the directory you `cd`'d into), so stale servers don't keep running after switching projects.
 
 Installed colorschemes (from `lua/plugins/colorscheme.lua`): vscode (with `group_overrides` for Java/CSS highlight groups), onedarkpro, github, kanagawa, gruvbox, tokyonight, monokai-pro, jb, neodarcula. `<leader>fc` previews all of them.
 
