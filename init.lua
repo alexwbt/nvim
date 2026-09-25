@@ -166,10 +166,15 @@ end
 
 local function prune_lsp_clients()
   local cwd = vim.fn.getcwd()
-  local clients = vim.lsp.get_clients()
-  for _, client in ipairs(clients) do
-    if client.config.root_dir and not string.find(cwd, client.config.root_dir, 1, true) then
-      client.stop()
+  for _, client in ipairs(vim.lsp.get_clients()) do
+    local root = client.config.root_dir
+    if root then
+      root = vim.fn.fnamemodify(root, ":p"):gsub("[/\\]$", "")
+      local inside_root = string.find(cwd, root, 1, true) == 1
+      local root_inside = string.find(root, cwd, 1, true) == 1
+      if not inside_root and not root_inside then
+        client.stop()
+      end
     end
   end
 end
