@@ -8,6 +8,7 @@ words = [
     "dapui",
     "esc",
     "fillchars",
+    "fzf",
     "glsl",
     "kanagawa",
     "keymaps",
@@ -15,6 +16,7 @@ words = [
     "lualine",
     "mvnw",
     "neodarcula",
+    "neotree",
     "noh",
     "nvim",
     "nvmrc",
@@ -23,6 +25,7 @@ words = [
     "vscode",
     "vscpp",
     "wincmd",
+    "zoxide",
 ]
 ignore_patterns = [
     'vim\..*\.\b[a-z]+\b',
