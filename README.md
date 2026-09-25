@@ -21,7 +21,15 @@ prettier, shfmt, java-debug/java-test bundles) is auto-installed by
 **mason-tool-installer** on first launch, and plugins/treesitter install via
 `:Lazy`/`:TSUpdate`. The following must be set up by hand:
 
-### 1. System packages (your OS package manager, not nvim/mason)
+### 1. Nerd Font (terminal font)
+
+Icons (nvim-web-devicons, lualine, snacks, telescope, gitsigns, etc.) are Nerd
+Font glyphs, rendered by the **terminal emulator**, not by nvim. This config
+does not install or select a font, so you must install a patched Nerd Font
+(e.g. from [nerdfonts.com](https://www.nerdfonts.com)) and set it as your
+terminal's font. Without it, icons show as blank boxes / question marks.
+
+### 2. System packages (your OS package manager, not nvim/mason)
 
 These are binaries that must be findable on the PATH. mason only ships
 LSP/formatter/linter/DAP tools, so these are not auto-installed:
@@ -37,14 +45,14 @@ LSP/formatter/linter/DAP tools, so these are not auto-installed:
 - `gdb` — C/C++ DAP
 - `curl` — minuet LLM HTTP requests
 
-### 2. minuet LLM API key
+### 3. minuet LLM API key
 
 `minuet` (AI completion) reads its config from `stdpath('data')/minuet.json`
 (`:MinuetConfig` writes a starter template on first run). You must add the
 `api_key` (literal key) or `api_key_env` (env var name). This is the one secret
 that must come from you — it cannot be auto-installed.
 
-### 3. Java (only if you work with Java)
+### 4. Java (only if you work with Java)
 
 - **Java >= 21 runtime** — via `$JAVA_HOME` or `java` on PATH.
 - **jdtls install** — place at `$JDTLS_HOME`, or a `jdtls`/`jdtls.bat` shim
@@ -54,7 +62,7 @@ that must come from you — it cannot be auto-installed.
 The java-debug/java-test bundles for DAP + test running **are** auto-installed by
 mason; without them the Java LSP still works but debugging/tests are disabled.
 
-### 4. First-launch steps in nvim
+### 5. First-launch steps in nvim
 
 1. `:Lazy` → wait for installs to finish.
 2. `:TSUpdate` → install + compile treesitter parsers.
