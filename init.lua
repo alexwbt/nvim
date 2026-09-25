@@ -161,6 +161,7 @@ local function set_project_colorscheme()
   else
     vim.cmd("colorscheme kanagawa-dragon")
   end
+  vim.opt.bg = "dark"
 end
 
 local function prune_lsp_clients()
@@ -173,11 +174,27 @@ local function prune_lsp_clients()
   end
 end
 
+local function prune_buffers()
+  local cwd = vim.fn.getcwd()
+  for _, buffer_number in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(buffer_number) then
+      local buffer_name = vim.fn.bufname(buffer_number)
+      if buffer_name ~= "" and buffer_name:sub(1, 1) ~= "[" then
+        local full = vim.fn.fnamemodify(buffer_name, ":p")
+        if not string.find(full, cwd, 1, true) and not vim.bo[buffer_number].modified then
+          vim.api.nvim_buf_delete(buffer_number, { force = true })
+        end
+      end
+    end
+  end
+end
+
 set_project_colorscheme()
 
 vim.api.nvim_create_autocmd("DirChanged", {
   callback = function()
-    set_project_colorscheme()
+    prune_buffers()
     prune_lsp_clients()
+    vim.defer_fn(set_project_colorscheme, 50)
   end,
 })
