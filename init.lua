@@ -82,15 +82,15 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 
-require("config.windows")
 require("config.jumplist")
-require("config.project-local")
 require("config.lsp")
+require("config.project-local")
+require("config.windows")
+
 require("config.lazy")
 -- plugins
 require("config.abolish")
 require("config.autotag")
-require("config.minuet")
 require("config.cmp")
 require("config.conform")
 require("config.dap")
@@ -100,6 +100,7 @@ require("config.fzf-lua")
 require("config.gitsigns")
 require("config.lsp-file-operations")
 require("config.lualine")
+require("config.minuet")
 require("config.multicursor")
 require("config.neotree")
 require("config.oil")

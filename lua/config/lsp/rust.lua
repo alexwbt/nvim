@@ -1,3 +1,4 @@
+vim.g.rust_recommended_style = 0
 
 vim.lsp.config("rust_analyzer", {
   cmd = { "rust-analyzer" },
