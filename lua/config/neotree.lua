@@ -4,7 +4,7 @@ local neotree = require("neo-tree")
 
 neotree.setup({
   filesystem = {
-    bind_to_cwd = false,
+    bind_to_cwd = true,
     group_empty_dirs = true,
     scan_mode = "deep",
     follow_current_file = {
