@@ -19,8 +19,9 @@ return {
         ["@keyword.conditional.ternary.java"] = { link = "@lsp" },
         ["SnacksDashboardDesc"] = { fg = "#4DAAFC" },
         ["SnacksDashboardIcon"] = { fg = "#4DAAFC" },
+        ["SnacksDashboardFile"] = { fg = "#DDDDDD" },
         ["SnacksDashboardKey"] = { fg = "#DDDDDD" },
-        ["SnacksDashboardFooter"] = { fg = "#DDDDDD" },
+        ["SnacksDashboardHeader"] = { fg = "#DDDDDD" },
       }
     }
   },

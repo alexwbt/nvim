@@ -412,10 +412,12 @@ function M.load()
   hl("GitSignsCurrentLineBlame", { fg = C.fg_dim })
 
   -- snacks dashboard
+  hl("SnacksDashboardDir", { fg = C.fg_dim })
+  hl("SnacksDashboardFile", { fg = C.fg })
   hl("SnacksDashboardKey", { fg = C.fg_dim })
   hl("SnacksDashboardIcon", { fg = C.keyword })
   hl("SnacksDashboardDesc", { fg = C.keyword })
-  hl("SnacksDashboardFooter", { fg = C.fg })
+  hl("SnacksDashboardHeader", { fg = C.fg })
 
   -- Indent blankline / indent guides if ever added.
   hl("IndentBlanklineChar", { fg = C.border })
