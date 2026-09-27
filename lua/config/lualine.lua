@@ -25,6 +25,12 @@ local function lsp_clients()
   return table.concat(names, ", ")
 end
 
+local function macro_recording()
+  local reg = vim.fn.reg_recording()
+  if reg == "" then return "" end
+  return "Recording @" .. reg
+end
+
 require("lualine").setup({
   options = {
     theme = "auto",
@@ -33,7 +39,7 @@ require("lualine").setup({
     },
   },
   sections = {
-    lualine_c = { { "filename", path = 1 } },
+    lualine_c = { macro_recording, { "filename", path = 1 } },
     lualine_x = { "encoding", "fileformat", "filetype", wpm_segment },
     lualine_y = { "location", lsp_clients },
     lualine_z = { current_time },
