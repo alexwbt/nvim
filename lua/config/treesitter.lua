@@ -22,6 +22,7 @@ ts.install({
   "vimdoc",
   "regex",
   "glsl",
+  "rust",
 })
 
 vim.api.nvim_create_autocmd("FileType", {

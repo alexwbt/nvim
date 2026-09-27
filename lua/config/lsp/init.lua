@@ -2,6 +2,7 @@ require("config.lsp.clangd")
 require("config.lsp.codebook")
 require("config.lsp.jdtls")
 require("config.lsp.lua")
+require("config.lsp.rust")
 require("config.lsp.typescript")
 
 vim.keymap.set("n", "<F2>", vim.lsp.buf.rename)

@@ -44,6 +44,12 @@ LSP/formatter/linter/DAP tools, so these are not auto-installed:
 - `zoxide` — `<leader>cd` (telescope-zoxide)
 - `gdb` — C/C++ DAP
 - `curl` — minuet LLM HTTP requests
+- `rustup` — Rust toolchain manager; provides `cargo`, `rust-analyzer` and
+  `rustfmt` in `~/.cargo/bin` (see https://rustup.rs). Not mason-managed so the
+  server stays matched to your toolchain. rustup's `default` profile installs
+  `rustfmt` but **not** rust-analyzer, so run `rustup component add rust-analyzer`
+  once. (The `~/.cargo/bin/rust-analyzer` proxy exists even without the component
+  and errors at runtime with "Unknown binary 'rust-analyzer.exe'".)
 
 ### 3. minuet LLM API key
 
@@ -88,14 +94,15 @@ These must be findable on the PATH at runtime.
 
 ### LSP servers
 
-Configured in `lua/config/lsp/*.lua`. `clangd`, `lua_ls`, `ts_ls` use
-`vim.lsp.config` + `vim.lsp.enable`; `jdtls` is started by the **`nvim-jdtls`**
+Configured in `lua/config/lsp/*.lua`. `clangd`, `lua_ls`, `rust_analyzer`, `ts_ls`
+use `vim.lsp.config` + `vim.lsp.enable`; `jdtls` is started by the **`nvim-jdtls`**
 plugin (`lua/plugins/jdtls.lua`).
 
 | Binary                             | Languages | Notes                                                                                                                                                                                                                                                                       |
 | ---------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `clangd`                           | C / C++   | mason-managed (`ensure_installed`)                                                                                                                                                                                                                                          |
 | `lua-language-server`              | Lua       | mason-managed (`ensure_installed`)                                                                                                                                                                                                                                          |
+| `rust-analyzer`                    | Rust      | provided by **rustup** (`~/.cargo/bin`), NOT mason-managed; see `lua/config/lsp/rust.lua`                                                                                                                                                                                   |
 | `typescript-language-server[.cmd]` | JS / TS   | mason-managed; `.cmd` suffix on Windows; see `lua/config/lsp/typescript.lua`                                                                                                                                                                                                |
 | `codebook-lsp[.cmd]`               | all       | spell checker for code; mason-managed (`codebook`); `.cmd` suffix on Windows; see `lua/config/lsp/codebook.lua`                                                                                                                                                              |
 | `java` (>= 21) or `$JAVA_HOME`     | Java      | jdtls launcher (via nvim-jdtls); deferred — only starts on first `.java` file open                                                                                                                                                                                          |
@@ -118,11 +125,13 @@ Configured in `lua/config/conform.lua`. Triggered by `<leader>F` in normal mode.
 | `prettier`     | js, ts, jsx, tsx, json, jsonc, html, css, scss, yaml, markdown |
 | `shfmt`        | sh, bash, zsh                                                  |
 | `clang-format` | c, cpp, glsl                                                   |
+| `rustfmt`      | rust                                                           |
 
 `prettier` and `shfmt` are mason-tool-installer-managed (`ensure_installed`).
 `prettier` implies `node` on PATH. `clang-format` is **not** mason-managed — it
 must be on the PATH (from the clang toolchain); for C/C++ `<leader>F` shells out to
-the `clang-format` binary rather than clangd's built-in formatter.
+the `clang-format` binary rather than clangd's built-in formatter. `rustfmt` is
+likewise **not** mason-managed — it ships with `rustup`.
 
 ### Debugger (nvim-dap)
 

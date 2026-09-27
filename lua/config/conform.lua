@@ -21,6 +21,8 @@ require("conform").setup({
     c = { "clang-format" },
     cpp = { "clang-format" },
     glsl = { "clang-format" },
+    -- rustfmt
+    rust = { "rustfmt" },
   },
 })
 
