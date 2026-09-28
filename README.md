@@ -84,19 +84,37 @@ LM_DIR="$(nvim --clean --headless \
   -c 'lua io.write((vim.fn.stdpath("data"):gsub("\\","/")).."/lemminx-maven")' \
   -c 'qa!' 2>/dev/null)"
 mkdir -p "$LM_DIR"
+# Use the `vscode-uber-jars` bundle: self-contained (lemminx core + lemminx-maven
+# + all deps INCLUDING guava). Do NOT use `zip-with-dependencies` — it omits
+# guava, so lemminx throws NoClassDefFoundError: com/google/common/cache/CacheBuilder
+# and Maven resolution (definition/completion) silently fails.
 curl -L -o /tmp/lm.zip \
-  "https://repo.eclipse.org/repository/lemminx-maven2-releases/org/eclipse/lemminx/lemminx-maven/0.12.0/lemminx-maven-0.12.0-zip-with-dependencies.zip"
+  "https://repo.eclipse.org/repository/lemminx-maven2-releases/org/eclipse/lemminx/lemminx-maven/0.12.0/lemminx-maven-0.12.0-vscode-uber-jars.zip"
 unzip -o /tmp/lm.zip -d "$LM_DIR"
 ```
 
 Discovery order: `$LEMMINX_MAVEN_HOME` → `stdpath('data')/lemminx-maven` →
 `~/lemminx-maven`. Any of those works (the last is XDG-independent if you'd
-rather not compute `stdpath`). It is scoped to `pom.xml` only (other XML is
-untouched) and offline/`.m2`-only by default — remove the `xml.maven.central.skip`
-block in `lua/config/lsp/lemminx.lua` for remote GAV completion. The
-parent/dependency POMs must be in `~/.m2` (a `mvn`/`./mvnw` build fetches them).
-Without the bundle, `pom.xml` still opens with syntax highlighting; only the LSP
-features are absent.
+rather not compute `stdpath`). The server appears as **`lemminx-maven`** in
+`:LspInfo`/the statusline and starts only for POM-named files (see below). Its
+workspace root mirrors jdtls (`.git`/`mvnw`/`.mvn` preferred over `pom.xml`), so
+in a multi-module build every module shares one reactor-root server (cross-module
+and `<parent>` resolution work) instead of one server per module. On the first
+open it builds the Maven project model in the background (tens of seconds), so
+definition/completion are empty until it finishes. It is offline/`.m2`-only by
+default — remove the `xml.maven.central.skip` block in `lua/config/lsp/lemminx.lua`
+for remote GAV completion. The parent/dependency POMs must be in `~/.m2` (a
+`mvn`/`./mvnw` build fetches them). Without the bundle, `pom.xml` still opens with
+syntax highlighting; only the LSP features are absent.
+
+**Custom-named parents.** lemminx-maven runs its Maven features only for files
+named `pom*.xml`, `*pom.xml`, or `*.pom` (hardcoded in the extension, no setting),
+and `lua/config/lsp/lemminx.lua` attaches to exactly those names. A custom parent
+kept as e.g. `.pom/springboot-parent.xml` therefore gets **no** Maven features —
+rename it to a matching name (e.g. `.pom/springboot-parent.pom`) and update the
+module `<relativePath>` entries (Maven uses the explicit `relativePath`, so the
+filename is free). Non-POM XML like `.pom/checkstyle.xml` is intentionally left to
+other tooling (its Checkstyle DTD is not validated by the Maven server).
 
 ### 6. First-launch steps in nvim
 
@@ -140,7 +158,7 @@ the **`nvim-jdtls`** plugin (`lua/plugins/jdtls.lua`).
 | jdtls install                      | Java      | `$JDTLS_HOME`, or `jdtls`/`jdtls.bat` shim on PATH, or a probed common dir                                                                                                                                                                                                  |
 | Lombok jar (optional)              | Java      | auto-discovered from Maven/Gradle caches                                                                                                                                                                                                                                    |
 | java-debug `/` java-test bundles   | Java      | installed via **mason-tool-installer** (`java-debug-adapter`, `java-test` → `<data>/mason/share`), or manually at `<jdtls-home>/java-debug` + `<jdtls-home>/vscode-java-test`, `stdpath('cache')/java-debug`, or `~/.debug-plugins` — enables Java DAP + JUnit test running |
-| `lemminx-maven` bundle (JVM)       | XML / `pom.xml` | NOT mason-managed; the mason `lemminx` binary is GraalVM-native and cannot load the extension. Prebuilt `lemminx-maven-<ver>-zip-with-dependencies.zip` launched via `java -cp` (manual install — see section 5); attaches to `pom.xml` only |
+| `lemminx-maven` bundle (JVM)       | XML / `pom.xml` | NOT mason-managed; the mason `lemminx` binary is GraalVM-native and cannot load the extension. Prebuilt `lemminx-maven-<ver>-vscode-uber-jars.zip` launched via `java -cp` (manual install — see section 5); attaches to `pom.xml` only |
 
 mason-tool-installer auto-installs `clangd`/`lua-language-server`/`typescript-language-server`/`codebook`
 on first launch (see the mason note below); they're then available to nvim only.
