@@ -20,12 +20,11 @@ vim.keymap.set("v", "<leader><space>", lsp_code_action, { desc = "LSP code actio
 local function hierarchy_entry(bufnr, client, item, label)
   local col = vim.lsp.util._get_line_byte_from_position(bufnr, item.range.start, client.offset_encoding) or 0
   local text = (item.detail and #item.detail > 0) and (item.name .. " " .. item.detail) or item.name
-  local filename = vim.uri_to_fname(item.uri)
   if label then
-    filename = string.format("[%s] %s", label, filename)
+    text = string.format("[%s] %s", label, text)
   end
   return {
-    filename = filename,
+    filename = vim.uri_to_fname(item.uri),
     lnum = item.range.start.line + 1,
     col = col + 1,
     text = text,
