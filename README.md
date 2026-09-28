@@ -68,7 +68,37 @@ that must come from you — it cannot be auto-installed.
 The java-debug/java-test bundles for DAP + test running **are** auto-installed by
 mason; without them the Java LSP still works but debugging/tests are disabled.
 
-### 5. First-launch steps in nvim
+### 5. Maven `pom.xml` support (optional, needs Java)
+
+Go-to-definition on `<parent>`/GAV/properties in `pom.xml` (e.g. jump to the
+`spring-boot-starter-parent` POM in `~/.m2`) comes from the **JVM** lemminx +
+`lemminx-maven` extension, launched by `lua/config/lsp/lemminx.lua`. The `lemminx`
+package mason ships is GraalVM-native and cannot load the extension, so install
+the prebuilt bundle by hand (needs a Java runtime, same as jdtls):
+
+```sh
+# Resolve nvim's data dir — do NOT hardcode ~/.local/share/nvim, which is only
+# the Linux XDG default (Windows uses %LOCALAPPDATA%\nvim-data, and an explicit
+# $XDG_DATA_HOME changes it too).
+LM_DIR="$(nvim --clean --headless \
+  -c 'lua io.write((vim.fn.stdpath("data"):gsub("\\","/")).."/lemminx-maven")' \
+  -c 'qa!' 2>/dev/null)"
+mkdir -p "$LM_DIR"
+curl -L -o /tmp/lm.zip \
+  "https://repo.eclipse.org/repository/lemminx-maven2-releases/org/eclipse/lemminx/lemminx-maven/0.12.0/lemminx-maven-0.12.0-zip-with-dependencies.zip"
+unzip -o /tmp/lm.zip -d "$LM_DIR"
+```
+
+Discovery order: `$LEMMINX_MAVEN_HOME` → `stdpath('data')/lemminx-maven` →
+`~/lemminx-maven`. Any of those works (the last is XDG-independent if you'd
+rather not compute `stdpath`). It is scoped to `pom.xml` only (other XML is
+untouched) and offline/`.m2`-only by default — remove the `xml.maven.central.skip`
+block in `lua/config/lsp/lemminx.lua` for remote GAV completion. The
+parent/dependency POMs must be in `~/.m2` (a `mvn`/`./mvnw` build fetches them).
+Without the bundle, `pom.xml` still opens with syntax highlighting; only the LSP
+features are absent.
+
+### 6. First-launch steps in nvim
 
 1. `:Lazy` → wait for installs to finish.
 2. `:TSUpdate` → install + compile treesitter parsers.
@@ -96,8 +126,8 @@ editing.
 ### LSP servers
 
 Configured in `lua/config/lsp/*.lua`. `clangd`, `lua_ls`, `rust_analyzer`, `ts_ls`
-use `vim.lsp.config` + `vim.lsp.enable`; `jdtls` is started by the **`nvim-jdtls`**
-plugin (`lua/plugins/jdtls.lua`).
+and `lemminx-maven` use `vim.lsp.config` + `vim.lsp.enable`; `jdtls` is started by
+the **`nvim-jdtls`** plugin (`lua/plugins/jdtls.lua`).
 
 | Binary                             | Languages | Notes                                                                                                                                                                                                                                                                       |
 | ---------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -110,12 +140,14 @@ plugin (`lua/plugins/jdtls.lua`).
 | jdtls install                      | Java      | `$JDTLS_HOME`, or `jdtls`/`jdtls.bat` shim on PATH, or a probed common dir                                                                                                                                                                                                  |
 | Lombok jar (optional)              | Java      | auto-discovered from Maven/Gradle caches                                                                                                                                                                                                                                    |
 | java-debug `/` java-test bundles   | Java      | installed via **mason-tool-installer** (`java-debug-adapter`, `java-test` → `<data>/mason/share`), or manually at `<jdtls-home>/java-debug` + `<jdtls-home>/vscode-java-test`, `stdpath('cache')/java-debug`, or `~/.debug-plugins` — enables Java DAP + JUnit test running |
+| `lemminx-maven` bundle (JVM)       | XML / `pom.xml` | NOT mason-managed; the mason `lemminx` binary is GraalVM-native and cannot load the extension. Prebuilt `lemminx-maven-<ver>-zip-with-dependencies.zip` launched via `java -cp` (manual install — see section 5); attaches to `pom.xml` only |
 
 mason-tool-installer auto-installs `clangd`/`lua-language-server`/`typescript-language-server`/`codebook`
 on first launch (see the mason note below); they're then available to nvim only.
 Missing `jdtls`/`java` only warns on first `.java` open. Without the
 java-debug/vscode-java-test bundles the Java LSP still works, but Java DAP and
-test running are silently disabled.
+test running are silently disabled. Missing the `lemminx-maven` bundle silently
+drops Maven-aware `pom.xml` features (see section 5).
 
 ### Formatters (conform.nvim)
 
@@ -177,6 +209,7 @@ with your system package manager.
 2. `:Lazy` → wait for installs to finish.
 3. `:TSUpdate` — installs + compiles tree-sitter parsers (the `tree-sitter` CLI is auto-installed by mason).
 4. `:Lazy build telescope-fzf-native` — runs `make` (needs `gcc` + `make`). If find_files/live_grep feel slow and `<data>/lazy/telescope-fzf-native.nvim/build/libfzf.dll` is missing (the Windows build can silently no-op), run `make` by hand inside that plugin directory. Both `fzf` and `zoxide` are loaded as Telescope extensions.
+5. (Optional, Java/Maven) unzip the JVM `lemminx-maven` bundle for `pom.xml` navigation — see section 5 above.
 
 ## Keymaps & commands
 
@@ -186,7 +219,7 @@ Leader is space. The full reference lives in `lua/config/*.lua` and `init.lua`.
 - `:GD [args]` `:GDF` `:GDH` — Diffview (open with args, current-file history, full repo history).
 - `<leader>ff` `<leader>fo` `<leader>fg` `<leader>fr` `<leader>fd` `<leader>fi` `<leader>fb` `<leader>fh` `<leader>fc` — Telescope (files, oldfiles, live grep, LSP refs/defs/impls, buffers, help, colorscheme). `<leader>fg` (live grep) is routed to **fzf-lua** instead of telescope — it streams `rg` once and prunes on backspace instead of re-spawning per keystroke (avoids the telescope `live_grep` freeze on Windows). Requires the `fzf` binary on PATH (install with your system package manager). `<leader>cd` — zoxide.
 - `<C-j>` / `<C-k>` — jump 10 lines (normal + visual). `<M-j>` / `<M-k>` — move line/block up/down with reindent. `<A-z>` — toggle word wrap. `<leader>o` / `<leader>i` — prev / next file in the jumplist. `<leader>;` — Snacks dashboard.
-- `<leader>F` — format buffer (conform, `lsp_fallback = true`). `<F2>` — LSP rename. `[d` / `]d` — prev / next diagnostic. `<leader><space>` — LSP code action.
+- `<leader>F` — format buffer (conform, `lsp_fallback = true`). `<F2>` — LSP rename. `[d` / `]d` — prev / next diagnostic. `<leader><space>` — LSP code action. In `pom.xml` (with the `lemminx-maven` bundle) `gd` / `<leader>fd` jumps to the `<parent>`/dependency/property definition.
 - `<F5>`/`<F6>`/`<F7>`/`<F8>`/`<F9>`/`<F10>` — DAP continue / step over / step into / step out / toggle breakpoint / restart. `<S-F5>` or `<F17>` — terminate. `<leader>dr` REPL, `<leader>du` dap-ui toggle, `<leader>ds` sessions sidebar. `:ClearBreakpoints`.
 - `:LspLog` — open the LSP log. `:LspLogClear` — truncate the LSP log file. `:LspInfo` — show attached LSP clients as a table (name, pid, memory, buffers, root; resolved from the OS) in a scratch-buffer split. `:JdtlsCleanWorkspace` (then restart) — wipe jdtls's per-project cache when Java indexes go stale. `:DapNew` (Java) — auto-discover main classes / JUnit tests and debug them.
 
