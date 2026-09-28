@@ -22,6 +22,7 @@ return {
         ["SnacksDashboardFile"] = { fg = "#DDDDDD" },
         ["SnacksDashboardKey"] = { fg = "#DDDDDD" },
         ["SnacksDashboardHeader"] = { fg = "#DDDDDD" },
+        ["NeoTreeIndentMarker"] = { fg = "#333333" },
       }
     }
   },
