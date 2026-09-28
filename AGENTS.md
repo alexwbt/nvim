@@ -65,7 +65,7 @@ So on Windows, `:!cmd`, terminal jobs, conform formatters, and LSP spawns inheri
 
 1. Launch Neovim — lazy clones itself into `stdpath('data')/lazy/lazy.nvim`.
 2. `:Lazy` → wait for installs.
-3. `:TSUpdate` — installs + compiles tree-sitter parsers via the `tree-sitter` CLI (must be on PATH; `nvim-treesitter` has `build = ":TSUpdate"`, `lazy = false`). Parser set is declared explicitly in `lua/config/treesitter.lua` via `ts.install(...)`.
+3. `:TSUpdate` — installs + compiles tree-sitter parsers via the `tree-sitter` CLI (auto-installed by **mason-tool-installer** under `<data>/mason/bin/`, so it's on PATH for nvim-spawned jobs; `nvim-treesitter` has `build = ":TSUpdate"`, `lazy = false`). Parser set is declared explicitly in `lua/config/treesitter.lua` via `ts.install(...)`.
 4. `:Lazy build telescope-fzf-native` — runs `make`; needs `gcc` + `make` on PATH. Auto-build can silently no-op on Windows (the build PATH isn't inherited into lazy's build job), so if `find_files`/`live_grep` feel slow, check `<data>/lazy/telescope-fzf-native.nvim/build/libfzf.dll` exists and run `make` by hand if not. `fzf` + `zoxide` are loaded as Telescope extensions.
 
 ## LSPs
@@ -84,7 +84,7 @@ Configured in `lua/config/lsp/*.lua` via `vim.lsp.config` + `vim.lsp.enable`, re
 
 Two separate plugins, both `lazy = false`, both in `lua/plugins/mason.lua`:
 - `config.mason` only calls `require("mason").setup({})` — it does NOT hold `ensure_installed`.
-- `config.mason-tool-installer` calls `require("mason-tool-installer").setup({ ensure_installed = {...}, auto_update = false, run_on_start = true, start_delay = 3000 })` — this is the actual auto-installer. `ensure_installed`: `java-debug-adapter`, `java-test`, `clangd`, `lua-language-server`, `typescript-language-server`, `codebook`, `prettier`, `shfmt`.
+- `config.mason-tool-installer` calls `require("mason-tool-installer").setup({ ensure_installed = {...}, auto_update = false, run_on_start = true, start_delay = 3000 })` — this is the actual auto-installer. `ensure_installed`: `java-debug-adapter`, `java-test`, `clangd`, `lua-language-server`, `typescript-language-server`, `codebook`, `prettier`, `shfmt`, `tree-sitter-cli`.
 
 mason prepends `<data>/mason/bin/` to `PATH` only within Neovim-spawned jobs (LSPs, conform, `:!`), so mason-managed binaries are invisible to a plain bash shell — available only to nvim. LSP servers are NOT wired through mason-lspconfig (config uses `vim.lsp.config`/`vim.lsp.enable`), so mason is only a source of tooling binaries. `:MasonInstall <pkg>` / `:MasonUpdate` manage them.
 

@@ -11,14 +11,15 @@
 
 require("mason-tool-installer").setup({
   ensure_installed = {
+    "clangd",
+    "codebook",
     "java-debug-adapter",
     "java-test",
-    "clangd",
     "lua-language-server",
-    "typescript-language-server",
-    "codebook",
     "prettier",
     "shfmt",
+    "tree-sitter-cli",
+    "typescript-language-server",
   },
   auto_update = false,
   run_on_start = true,

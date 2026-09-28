@@ -17,8 +17,8 @@ repeated `vim.fn.has("win32")` calls.
 ## Manual setup (not automated)
 
 Most tooling (clangd, lua-language-server, typescript-language-server, codebook,
-prettier, shfmt, java-debug/java-test bundles) is auto-installed by
-**mason-tool-installer** on first launch, and plugins/treesitter install via
+prettier, shfmt, tree-sitter-cli, java-debug/java-test bundles) is auto-installed
+by **mason-tool-installer** on first launch, and plugins/treesitter install via
 `:Lazy`/`:TSUpdate`. The following must be set up by hand:
 
 ### 1. Nerd Font (terminal font)
@@ -35,7 +35,7 @@ These are binaries that must be findable on the PATH. mason only ships
 LSP/formatter/linter/DAP tools, so these are not auto-installed:
 
 - `bash` — on Windows only (`&shell` is forced to bash)
-- `gcc`, `make`, `tree-sitter` — build toolchain, needed only at install time
+- `gcc`, `make` — build toolchain, needed only at install time
 - `node` + `prettier` — prettier; `node` also runs typescript-language-server
 - `shfmt` — shell formatter
 - `clang-format` — C/C++ formatter
@@ -88,9 +88,10 @@ These must be findable on the PATH at runtime.
 | `git`         | lazy.nvim bootstrap + plugin clones                                            | install / updates |
 | `gcc`         | compiler used by `tree-sitter` and `make` builds                               | install only      |
 | `make`        | `telescope-fzf-native` build (`build = 'make'`)                                | install only      |
-| `tree-sitter` | required by `nvim-treesitter`'s `ts.install(...)` to fetch and compile parsers | install only      |
 
-`gcc`/`make`/`tree-sitter` are only needed at install time — not for normal editing.
+`gcc`/`make` are needed only at install time; the `tree-sitter` CLI is
+mason-managed (auto-installed under `<data>/mason/bin/`) — not needed for normal
+editing.
 
 ### LSP servers
 
@@ -159,8 +160,8 @@ tests. See `lua/config/dap.lua`.
 `ensure_installed`. The auto-install list lives in
 **mason-tool-installer.nvim** (`lua/config/mason-tool-installer.lua`, separate
 `lazy = false` plugin), which installs `clangd`, `lua-language-server`,
-`typescript-language-server`, `codebook`, `prettier`, `shfmt`, and the
-`java-debug-adapter` / `java-test` bundles into `<data>/mason/` on startup
+`typescript-language-server`, `codebook`, `prettier`, `shfmt`, `tree-sitter-cli`,
+and the `java-debug-adapter` / `java-test` bundles into `<data>/mason/` on startup
 (`run_on_start = true`, `start_delay = 3000`). mason prepends
 `<data>/mason/bin/` to `PATH` only inside Neovim-spawned jobs (LSPs, conform,
 `:!`), so these binaries are available to nvim but **not** to a plain
@@ -174,7 +175,7 @@ with your system package manager.
 
 1. Launch Neovim — lazy clones itself into `stdpath('data')/lazy/lazy.nvim`.
 2. `:Lazy` → wait for installs to finish.
-3. `:TSUpdate` — installs + compiles tree-sitter parsers (requires the `tree-sitter` CLI on PATH).
+3. `:TSUpdate` — installs + compiles tree-sitter parsers (the `tree-sitter` CLI is auto-installed by mason).
 4. `:Lazy build telescope-fzf-native` — runs `make` (needs `gcc` + `make`). If find_files/live_grep feel slow and `<data>/lazy/telescope-fzf-native.nvim/build/libfzf.dll` is missing (the Windows build can silently no-op), run `make` by hand inside that plugin directory. Both `fzf` and `zoxide` are loaded as Telescope extensions.
 
 ## Keymaps & commands
