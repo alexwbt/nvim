@@ -28,7 +28,7 @@ local function prune_buffers()
   end
 end
 
-vim.api.nvim_create_user_command("Prune", function()
+vim.api.nvim_create_user_command("LspPrune", function()
   prune_buffers()
   prune_lsp_clients()
 end, { desc = "Prune buffers and lsp clients" })

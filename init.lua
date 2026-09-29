@@ -85,7 +85,6 @@ vim.api.nvim_create_autocmd("FileType", {
 local project = require("config.project-local")
 require("config.jumplist")
 require("config.lsp")
-require("config.prune")
 require("config.windows")
 
 -- plugins
