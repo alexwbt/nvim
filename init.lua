@@ -55,7 +55,9 @@ vim.keymap.set("n", "<leader>bd", function()
   local loaded_buffers = vim.api.nvim_list_bufs()
   local deleted_count = 0
   for _, buf in ipairs(loaded_buffers) do
-    if vim.api.nvim_buf_is_loaded(buf) and not visible_buffers[buf] then
+    if vim.api.nvim_buf_is_loaded(buf)
+      and not visible_buffers[buf]
+      and vim.bo[buf].buftype ~= "terminal" then
       local success, _ = pcall(vim.api.nvim_buf_delete, buf, { force = false })
       if success then
         deleted_count = deleted_count + 1
