@@ -72,7 +72,7 @@ mason; without them the Java LSP still works but debugging/tests are disabled.
 
 Go-to-definition on `<parent>`/GAV/properties in `pom.xml` (e.g. jump to the
 `spring-boot-starter-parent` POM in `~/.m2`) comes from the **JVM** lemminx +
-`lemminx-maven` extension, launched by `lua/config/lsp/lemminx.lua`. The `lemminx`
+`lemminx-maven` extension, launched by `lua/config/lsp/clients/lemminx.lua`. The `lemminx`
 package mason ships is GraalVM-native and cannot load the extension, so install
 the prebuilt bundle by hand (needs a Java runtime, same as jdtls):
 
@@ -102,14 +102,14 @@ in a multi-module build every module shares one reactor-root server (cross-modul
 and `<parent>` resolution work) instead of one server per module. On the first
 open it builds the Maven project model in the background (tens of seconds), so
 definition/completion are empty until it finishes. It is offline/`.m2`-only by
-default — remove the `xml.maven.central.skip` block in `lua/config/lsp/lemminx.lua`
+default — remove the `xml.maven.central.skip` block in `lua/config/lsp/clients/lemminx.lua`
 for remote GAV completion. The parent/dependency POMs must be in `~/.m2` (a
 `mvn`/`./mvnw` build fetches them). Without the bundle, `pom.xml` still opens with
 syntax highlighting; only the LSP features are absent.
 
 **Custom-named parents.** lemminx-maven runs its Maven features only for files
 named `pom*.xml`, `*pom.xml`, or `*.pom` (hardcoded in the extension, no setting),
-and `lua/config/lsp/lemminx.lua` attaches to exactly those names. A custom parent
+and `lua/config/lsp/clients/lemminx.lua` attaches to exactly those names. A custom parent
 kept as e.g. `.pom/springboot-parent.xml` therefore gets **no** Maven features —
 rename it to a matching name (e.g. `.pom/springboot-parent.pom`) and update the
 module `<relativePath>` entries (Maven uses the explicit `relativePath`, so the
@@ -143,7 +143,7 @@ editing.
 
 ### LSP servers
 
-Configured in `lua/config/lsp/*.lua`. `clangd`, `lua_ls`, `rust_analyzer`, `ts_ls`
+Configured in `lua/config/lsp/clients/*.lua`. `clangd`, `lua_ls`, `rust_analyzer`, `ts_ls`
 and `lemminx-maven` use `vim.lsp.config` + `vim.lsp.enable`; `jdtls` is started by
 the **`nvim-jdtls`** plugin (`lua/plugins/jdtls.lua`).
 
@@ -151,9 +151,9 @@ the **`nvim-jdtls`** plugin (`lua/plugins/jdtls.lua`).
 | ---------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `clangd`                           | C / C++   | mason-managed (`ensure_installed`)                                                                                                                                                                                                                                          |
 | `lua-language-server`              | Lua       | mason-managed (`ensure_installed`)                                                                                                                                                                                                                                          |
-| `rust-analyzer`                    | Rust      | provided by **rustup** (`~/.cargo/bin`), NOT mason-managed; see `lua/config/lsp/rust.lua`                                                                                                                                                                                   |
-| `typescript-language-server[.cmd]` | JS / TS   | mason-managed; `.cmd` suffix on Windows; see `lua/config/lsp/typescript.lua`                                                                                                                                                                                                |
-| `codebook-lsp[.cmd]`               | all       | spell checker for code; mason-managed (`codebook`); `.cmd` suffix on Windows; see `lua/config/lsp/codebook.lua`                                                                                                                                                              |
+| `rust-analyzer`                    | Rust      | provided by **rustup** (`~/.cargo/bin`), NOT mason-managed; see `lua/config/lsp/clients/rust.lua`                                                                                                                                                                                   |
+| `typescript-language-server[.cmd]` | JS / TS   | mason-managed; `.cmd` suffix on Windows; see `lua/config/lsp/clients/typescript.lua`                                                                                                                                                                                                |
+| `codebook-lsp[.cmd]`               | all       | spell checker for code; mason-managed (`codebook`); `.cmd` suffix on Windows; see `lua/config/lsp/clients/codebook.lua`                                                                                                                                                              |
 | `java` (>= 21) or `$JAVA_HOME`     | Java      | jdtls launcher (via nvim-jdtls); deferred — only starts on first `.java` file open                                                                                                                                                                                          |
 | jdtls install                      | Java      | `$JDTLS_HOME`, or `jdtls`/`jdtls.bat` shim on PATH, or a probed common dir                                                                                                                                                                                                  |
 | Lombok jar (optional)              | Java      | auto-discovered from Maven/Gradle caches                                                                                                                                                                                                                                    |
@@ -239,5 +239,5 @@ Leader is space. The full reference lives in `lua/config/*.lua` and `init.lua`.
 - `<C-j>` / `<C-k>` — jump 10 lines (normal + visual). `<M-j>` / `<M-k>` — move line/block up/down with reindent. `<A-z>` — toggle word wrap. `<leader>o` / `<leader>i` — prev / next file in the jumplist. `<leader>;` — Snacks dashboard.
 - `<leader>F` — format buffer (conform, `lsp_fallback = true`). `<F2>` — LSP rename. `[d` / `]d` — prev / next diagnostic. `<leader><space>` — LSP code action. In `pom.xml` (with the `lemminx-maven` bundle) `gd` / `<leader>fd` jumps to the `<parent>`/dependency/property definition.
 - `<F5>`/`<F6>`/`<F7>`/`<F8>`/`<F9>`/`<F10>` — DAP continue / step over / step into / step out / toggle breakpoint / restart. `<S-F5>` or `<F17>` — terminate. `<leader>dr` REPL, `<leader>du` dap-ui toggle, `<leader>ds` sessions sidebar. `:ClearBreakpoints`.
-- `:LspLog` — open the LSP log. `:LspLogClear` — truncate the LSP log file. `:LspInfo` — show attached LSP clients as a table (name, pid, memory, buffers, root; resolved from the OS) in a scratch-buffer split. `:JdtlsCleanWorkspace` (then restart) — wipe jdtls's per-project cache when Java indexes go stale. `:DapNew` (Java) — auto-discover main classes / JUnit tests and debug them.
+- `:LspLog` — open the LSP log. `:LspLogClear` — truncate the LSP log file. `:LspInfo` — show attached LSP clients as a table (name, pid, memory, buffers, root; resolved from the OS) in a scratch-buffer split. `:LspPrune` — delete loaded, unmodified buffers outside cwd and stop LSP clients whose root no longer contains cwd. `<leader>ft` — LSP type hierarchy (subtypes + supertypes). `:JdtlsCleanWorkspace` (then restart) — wipe jdtls's per-project cache when Java indexes go stale. `:DapNew` (Java) — auto-discover main classes / JUnit tests and debug them.
 
