@@ -63,7 +63,9 @@ that must come from you — it cannot be auto-installed.
 - **Java >= 21 runtime** — via `$JAVA_HOME` or `java` on PATH.
 - **jdtls install** — place at `$JDTLS_HOME`, or a `jdtls`/`jdtls.bat` shim
   on PATH, or a probed common dir. Not auto-installed by mason.
-- **Lombok** (optional) — auto-discovered from Maven/Gradle caches; nothing to do.
+- **Lombok** (optional) — auto-discovered from Maven/Gradle caches; nothing to
+  do. It's applied as a JVM `-javaagent` when jdtls starts, so if a build adds
+  it to the cache after jdtls is already running, run `:JdtlsRestart`.
 
 The java-debug/java-test bundles for DAP + test running **are** auto-installed by
 mason; without them the Java LSP still works but debugging/tests are disabled.
@@ -156,7 +158,7 @@ the **`nvim-jdtls`** plugin (`lua/plugins/jdtls.lua`).
 | `codebook-lsp[.cmd]`               | all       | spell checker for code; mason-managed (`codebook`); `.cmd` suffix on Windows; see `lua/config/lsp/clients/codebook.lua`                                                                                                                                                              |
 | `java` (>= 21) or `$JAVA_HOME`     | Java      | jdtls launcher (via nvim-jdtls); deferred — only starts on first `.java` file open                                                                                                                                                                                          |
 | jdtls install                      | Java      | `$JDTLS_HOME`, or `jdtls`/`jdtls.bat` shim on PATH, or a probed common dir                                                                                                                                                                                                  |
-| Lombok jar (optional)              | Java      | auto-discovered from Maven/Gradle caches                                                                                                                                                                                                                                    |
+| Lombok jar (optional)              | Java      | auto-discovered from Maven/Gradle caches; applied as `-javaagent` at server start (run `:JdtlsRestart` to pick up a jar added after jdtls started)                                                                                                                            |
 | java-debug `/` java-test bundles   | Java      | installed via **mason-tool-installer** (`java-debug-adapter`, `java-test` → `<data>/mason/share`), or manually at `<jdtls-home>/java-debug` + `<jdtls-home>/vscode-java-test`, `stdpath('cache')/java-debug`, or `~/.debug-plugins` — enables Java DAP + JUnit test running |
 | `lemminx-maven` bundle (JVM)       | XML / `pom.xml` | NOT mason-managed; the mason `lemminx` binary is GraalVM-native and cannot load the extension. Prebuilt `lemminx-maven-<ver>-vscode-uber-jars.zip` launched via `java -cp` (manual install — see section 5); attaches to `pom.xml` only |
 
@@ -239,5 +241,5 @@ Leader is space. The full reference lives in `lua/config/*.lua` and `init.lua`.
 - `<C-j>` / `<C-k>` — jump 10 lines (normal + visual). `<M-j>` / `<M-k>` — move line/block up/down with reindent. `<A-z>` — toggle word wrap. `<leader>o` / `<leader>i` — prev / next file in the jumplist. `<leader>;` — Snacks dashboard.
 - `<leader>F` — format buffer (conform, `lsp_fallback = true`). `<F2>` — LSP rename. `[d` / `]d` — prev / next diagnostic. `<leader><space>` — LSP code action. In `pom.xml` (with the `lemminx-maven` bundle) `gd` / `<leader>fd` jumps to the `<parent>`/dependency/property definition.
 - `<F5>`/`<F6>`/`<F7>`/`<F8>`/`<F9>`/`<F10>` — DAP continue / step over / step into / step out / toggle breakpoint / restart. `<S-F5>` or `<F17>` — terminate. `<leader>dr` REPL, `<leader>du` dap-ui toggle, `<leader>ds` sessions sidebar. `:ClearBreakpoints`.
-- `:LspLog` — open the LSP log. `:LspLogClear` — truncate the LSP log file. `:LspInfo` — show attached LSP clients as a table (name, pid, memory, buffers, root; resolved from the OS) in a scratch-buffer split. `:LspPrune` — delete loaded, unmodified buffers outside cwd and stop LSP clients whose root no longer contains cwd. `<leader>ft` — LSP type hierarchy (subtypes + supertypes). `:JdtlsCleanWorkspace` (then restart) — wipe jdtls's per-project cache when Java indexes go stale. `:DapNew` (Java) — auto-discover main classes / JUnit tests and debug them.
+- `:LspLog` — open the LSP log. `:LspLogClear` — truncate the LSP log file. `:LspInfo` — show attached LSP clients as a table (name, pid, memory, buffers, root; resolved from the OS) in a scratch-buffer split. `:LspPrune` — delete loaded, unmodified buffers outside cwd and stop LSP clients whose root no longer contains cwd. `<leader>ft` — LSP type hierarchy (subtypes + supertypes). `:JdtlsCleanWorkspace` (then restart) — wipe jdtls's per-project cache when Java indexes go stale. `:JdtlsRestart` — restart jdtls, re-resolving the Lombok javaagent (use when a build adds Lombok to the cache after the server started; unlike `:LspRestart`/`:JdtRestart` it rebuilds `cmd`). `:DapNew` (Java) — auto-discover main classes / JUnit tests and debug them.
 

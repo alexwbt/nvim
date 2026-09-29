@@ -80,14 +80,18 @@ local function find_lombok()
   local jars = {}
   for _, root in ipairs(roots) do
     if root ~= "" and vim.uv.fs_stat(root) then
-      for _, jar in ipairs(vim.fn.glob(root .. "/*/lombok-*.jar", false, true)) do
+      -- Maven nests one level (`<ver>/lombok-<ver>.jar`); Gradle nests two
+      -- (`<ver>/<hash>/lombok-<ver>.jar`), so glob recursively to cover both.
+      for _, jar in ipairs(vim.fn.glob(root .. "/**/lombok-*.jar", false, true)) do
         if not jar:match("-sources%.jar$") then jars[#jars + 1] = jar end
       end
     end
   end
   table.sort(jars, function(a, b)
-    local va = a:match("lombok/(%d+%.%d+%.%d+)") or ""
-    local vb = b:match("lombok/(%d+%.%d+%.%d+)") or ""
+    -- `glob()` returns OS-native separators (backslashes on Windows), so accept
+    -- both here rather than assuming `/`.
+    local va = a:match("lombok[\\/](%d+%.%d+%.%d+)") or ""
+    local vb = b:match("lombok[\\/](%d+%.%d+%.%d+)") or ""
     return vnum(va) < vnum(vb)
   end)
   return jars[#jars]
@@ -179,9 +183,15 @@ end, { desc = "Delete jdtls per-project workspace cache" })
 -- opens. Fires on every `FileType java`; nvim-jdtls's start_or_attach is
 -- idempotent per buffer (skips already-attached buffers, and starts a separate
 -- server when the module/root_dir differs), keeping startup cheap for non-Java work.
+--
+-- The augroup lets `:JdtlsRestart` re-run only this handler (not every FileType
+-- handler registered by other plugins) to rebuild `cmd` with a fresh
+-- `find_lombok()` result.
+local jdtls_augroup = vim.api.nvim_create_augroup("config_jdtls", { clear = true })
 vim.api.nvim_create_autocmd("FileType", {
+  group = jdtls_augroup,
   pattern = "java",
-  callback = function()
+  callback = function(args)
     local ok, jdtls = pcall(require, "jdtls")
     if not ok then
       vim.notify("jdtls: nvim-jdtls not installed — run :Lazy", vim.log.levels.WARN)
@@ -193,16 +203,16 @@ vim.api.nvim_create_autocmd("FileType", {
     if not jdtls_home or not java then
       vim.notify(
         "jdtls: not configured — "
-          .. (not jdtls_home and "jdtls install not found (set $JDTLS_HOME)" or "")
-          .. (not jdtls_home and not java and "; " or "")
-          .. (not java and "java runtime not found (set $JAVA_HOME)" or ""),
+        .. (not jdtls_home and "jdtls install not found (set $JDTLS_HOME)" or "")
+        .. (not jdtls_home and not java and "; " or "")
+        .. (not java and "java runtime not found (set $JAVA_HOME)" or ""),
         vim.log.levels.WARN)
       return
     end
 
     local plugins = jdtls_home .. "/plugins"
     local launcher = vim.fn.glob(plugins .. "/org.eclipse.equinox.launcher_*.jar", false, true)[1]
-      or (plugins .. "/org.eclipse.equinox.launcher.jar")
+        or (plugins .. "/org.eclipse.equinox.launcher.jar")
     local config_dir = jdtls_home .. "/" .. config_subdir()
     local lombok = find_lombok()
     -- java-debug (+ java-test) bundles; nil => DAP/test disabled.
@@ -227,7 +237,7 @@ vim.api.nvim_create_autocmd("FileType", {
     end
     vim.list_extend(cmd, { "-jar", launcher, "-data", data_dir() })
 
-    local root = vim.fs.root(0, ROOT_MARKERS) or vim.fn.getcwd()
+    local root = vim.fs.root(args.buf, ROOT_MARKERS) or vim.fn.getcwd()
 
     -- Formatter settings file (Eclipse XML). Resolved per project, in priority
     -- order:
@@ -333,7 +343,7 @@ vim.api.nvim_create_autocmd("FileType", {
     -- config (in config/dap.lua) is missing.
     if bundles then pcall(jdtls.setup.add_commands) end
 
-    jdtls.start_or_attach(config)
+    jdtls.start_or_attach(config, nil, { bufnr = args.buf })
 
     -- Extend <leader>F for java buffers: run jdtls's custom `java/organizeImports`
     -- request, then format (conform with lsp_fallback) in the callback so the
@@ -355,6 +365,44 @@ vim.api.nvim_create_autocmd("FileType", {
         end
         require("conform").format({ async = true, lsp_fallback = true })
       end)
-    end, { buffer = 0, desc = "Format buffer (organize imports + format)" })
+    end, { buffer = args.buf, desc = "Format buffer (organize imports + format)" })
   end,
 })
+
+-- Restart jdtls, re-resolving the Lombok javaagent.
+--
+-- Stopping the clients and re-firing the FileType handler above
+-- rebuilds `cmd` via `find_lombok()`, then re-attaches every buffer.
+vim.api.nvim_create_user_command("JdtlsRestart", function()
+  local clients = vim.lsp.get_clients({ name = "jdtls" })
+  if #clients == 0 then
+    vim.notify("jdtls: no running client to restart", vim.log.levels.WARN)
+    return
+  end
+
+  -- Snapshot attached buffers + client ids before stopping.
+  local buffers, ids = {}, {}
+  for _, client in ipairs(clients) do
+    ids[#ids + 1] = client.id
+    for buf in pairs(client.attached_buffers) do
+      if vim.api.nvim_buf_is_valid(buf) then buffers[buf] = true end
+    end
+  end
+
+  for _, client in ipairs(clients) do
+    client:stop()
+  end
+  vim.wait(30000, function()
+    for _, id in ipairs(ids) do
+      if vim.lsp.get_client_by_id(id) ~= nil then return false end
+    end
+    return true
+  end)
+
+  for buf in pairs(buffers) do
+    if vim.api.nvim_buf_is_valid(buf) then
+      vim.api.nvim_exec_autocmds("FileType", { group = jdtls_augroup, buffer = buf })
+    end
+  end
+  vim.notify("jdtls: restarted (Lombok agent re-resolved)", vim.log.levels.INFO)
+end, { desc = "Restart jdtls (re-resolves the Lombok javaagent)" })
