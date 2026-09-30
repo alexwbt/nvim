@@ -26,17 +26,27 @@ return {
       }
     }
   },
-  { "olimorris/onedarkpro.nvim" },
-  { "projekt0n/github-nvim-theme" },
-  { "rebelot/kanagawa.nvim" },
-  { "morhetz/gruvbox" },
-  { "folke/tokyonight.nvim" },
-  { "loctvl842/monokai-pro.nvim" },
-  { "nickkadutskyi/jb.nvim" },
   {
     "pmouraguedes/neodarcula.nvim",
     opts = {
-      transparent = true, dim = true
+      transparent = true,
+      dim = true,
     }
   },
+  {
+    "neanias/everforest-nvim",
+    config = function()
+      require("everforest").setup({
+        background = "hard",
+        ui_contrast = "high",
+      })
+    end
+  },
+  { "folke/tokyonight.nvim" },
+  { "loctvl842/monokai-pro.nvim" },
+  { "morhetz/gruvbox" },
+  { "nickkadutskyi/jb.nvim" },
+  { "olimorris/onedarkpro.nvim" },
+  { "projekt0n/github-nvim-theme" },
+  { "rebelot/kanagawa.nvim" },
 }
