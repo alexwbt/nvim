@@ -404,5 +404,5 @@ vim.api.nvim_create_user_command("JdtlsRestart", function()
       vim.api.nvim_exec_autocmds("FileType", { group = jdtls_augroup, buffer = buf })
     end
   end
-  vim.notify("jdtls: restarted (Lombok agent re-resolved)", vim.log.levels.INFO)
+  vim.notify("jdtls: restarted", vim.log.levels.INFO)
 end, { desc = "Restart jdtls (re-resolves the Lombok javaagent)" })
