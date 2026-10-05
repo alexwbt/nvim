@@ -102,6 +102,10 @@ vim.api.nvim_create_autocmd("DirChanged", {
     vim.defer_fn(function()
       load_project_config()
       set_project_colorscheme()
+      local ok, lualine = pcall(require, "config.lualine")
+      if ok and lualine.apply_state then
+        lualine.apply_state()
+      end
     end, 50)
   end,
 })
