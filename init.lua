@@ -21,6 +21,7 @@ vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.cmd([[set fillchars+=vert:\ ]])
 
 vim.g.mapleader = " "
+vim.g.nvim_surround_no_insert_mappings = true
 
 vim.keymap.set("n", "<C-k>", "10k")
 vim.keymap.set("n", "<C-j>", "10j")
