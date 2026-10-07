@@ -34,7 +34,7 @@ Telescope's `live_grep` re-spawns `rg` on every keystroke (including backspace) 
 
 - C++ root (`CMakeLists.txt`, `.clangd`, `.clang-format`, `.clang-tidy`) → `colorscheme vscpp` (the hand-rolled `colors/vscpp.lua`).
 - JS root (`package.json`, `tsconfig.json`, `jsconfig.json`, `node_modules`, `yarn.lock`, `pnpm-lock.yaml`, `package-lock.json`, `bun.lockb`, `.nvmrc`) → `colorscheme vscode`.
-- Java root (`pom.xml`, `mvnw`, `mvnw.cmd`) → `colorscheme vscode` (NOT `jb`).
+- Java root (`pom.xml`, `mvnw`, `mvnw.cmd`) → `colorscheme jb`.
 - No match → `colorscheme kanagawa-dragon`.
 
 The `DirChanged` callback reloads the project config (`load_project_config`) and re-applies the colorscheme; stale LSP servers are no longer stopped automatically — run `:LspPrune` (`lua/config/lsp/prune.lua`) to delete out-of-cwd buffers and stop clients whose `root_dir` no longer contains the cwd.
