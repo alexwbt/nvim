@@ -15,6 +15,9 @@ neotree.setup({
       visible = true,
     },
   },
+  window = {
+    auto_expand_width = true,
+  }
 })
 
 vim.keymap.set("n", "<leader>ge", function()
