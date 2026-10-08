@@ -4,6 +4,13 @@ local scheme_overrides = {
   jb = {
     TelescopePreviewLine = { link = "Visual" },
     TelescopePreviewMatch = { link = "Search" },
+    SnacksDashboardHeader = { fg = "#c77dbb" },
+    SnacksDashboardIcon = { fg = "#2aacb8" },
+    SnacksDashboardKey = { fg = "#c77dbb" },
+    SnacksDashboardDesc = { fg = "#bcbec4" },
+    SnacksDashboardDir = { fg = "#4f5258" },
+    SnacksDashboardFile = { fg = "#bcbec4" },
+    SnacksDashboardTitle = { fg = "#bcbec4" },
   },
 }
 
