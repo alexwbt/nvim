@@ -10,7 +10,7 @@ Neovim configuration repo (platform-conditional: works on Windows and Unix; the 
 2. `config.lazy` (bootstraps lazy.nvim, auto-imports everything under `lua/plugins/`).
 3. Plugin configs, in this exact order: `config.abolish` → `config.autotag` → `config.minuet` → `config.cmp` → `config.conform` → `config.dap` → `config.diffview` → `config.fidget` → `config.fzf-lua` → `config.gitsigns` → `config.lsp-file-operations` → `config.lualine` → `config.multicursor` → `config.neotree` → `config.oil` → `config.spectre` → `config.telescope` → `config.treesitter` → `config.wpm`. **`config.minuet` must load before `config.cmp`** — minuet registers itself as the `minuet` cmp source inside `setup()`.
 4. `config.snacks` and `config.live-preview` are NOT required from `init.lua` — each runs in the `config =` callback of its plugin spec (`lua/plugins/snacks.lua` is `lazy = false`, `priority = 1000`; `lua/plugins/live-preview.lua` is `cmd = "LivePreview"`, `ft = markdown/html/asciidoc/svg`).
-5. Colorscheme (conditional, last — evaluates project markers by walking up from cwd, see below). The logic lives in `config.project-local` (module at `lua/config/project-local.lua`), which registers a `DirChanged` autocmd; `init.lua` calls `project.set_project_colorscheme()` at the very end.
+5. Colorscheme (conditional, last — evaluates project markers by walking up from cwd, see below). The logic lives in `config.project-local` (module at `lua/config/project-local.lua`), which registers a `DirChanged` autocmd; `init.lua` calls `project.set_project_colorscheme()` at the very end. `config.colorscheme` (a plain `ColorScheme` autocmd, `lua/config/colorscheme.lua`) is required just before `set_project_colorscheme()` so its per-scheme highlight overrides re-apply after every colorscheme load.
 
 ## Layout
 
@@ -40,6 +40,19 @@ Telescope's `live_grep` re-spawns `rg` on every keystroke (including backspace) 
 The `DirChanged` callback reloads the project config (`load_project_config`) and re-applies the colorscheme; stale LSP servers are no longer stopped automatically — run `:LspPrune` (`lua/config/lsp/prune.lua`) to delete out-of-cwd buffers and stop clients whose `root_dir` no longer contains the cwd.
 
 Installed colorschemes (from `lua/plugins/colorscheme.lua`): vscode (with `group_overrides` for Java/CSS highlight groups), onedarkpro, github, kanagawa, gruvbox, tokyonight, monokai-pro, jb, neodarcula. `<leader>fc` previews all of them.
+
+Per-scheme highlight overrides live in `config.colorscheme` (module at `lua/config/colorscheme.lua`), which registers a `ColorScheme` autocmd and re-applies the handler on every load (the conditional scheme on startup + `DirChanged`). Overrides are a nested table keyed by `vim.g.colors_name`, then highlight group → `vim.api.nvim_set_hl` attrs:
+
+```lua
+local scheme_overrides = {
+  jb = {
+    TelescopePreviewLine  = { link = "Visual" },
+    TelescopePreviewMatch = { link = "Search" },
+  },
+}
+```
+
+Add a colorscheme by adding a key with the same name it sets in `vim.g.colors_name`. Groups left unset under a scheme are untouched — keep in mind that a scheme which doesn't override a group leaves telescope's default intact.
 
 ## Platform: Windows + Unix
 
