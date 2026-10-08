@@ -11,7 +11,7 @@ vim.api.nvim_create_user_command("WpmStats", function()
     "WPM (current 80th pct): " .. wpm.wpm(),
     "Best:                   " .. wpm.best(),
     "Lifetime WPM (avg):     " .. wpm.lifetime_wpm(),
-    "Historic graph:          " .. wpm.historic_graph(),
+    "Historic graph:         " .. wpm.historic_graph(),
     "Sorted graph:           " .. wpm.sorted_graph(),
   }
   vim.api.nvim_echo(

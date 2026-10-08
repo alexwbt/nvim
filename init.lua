@@ -85,18 +85,11 @@ vim.api.nvim_create_autocmd("FileType", {
   command = "wincmd T",
 })
 
-
-local project = require("config.project-local")
-require("config.jumplist")
-require("config.lsp")
-require("config.windows")
-
 -- plugins
 require("config.lazy")
 require("config.abolish")
 require("config.autotag")
 require("config.cmp")
-require("config.colorscheme")
 require("config.conform")
 require("config.dap")
 require("config.diffview")
@@ -112,6 +105,14 @@ require("config.oil")
 require("config.spectre")
 require("config.telescope")
 require("config.treesitter")
+
+-- custom
+require("config.colorscheme")
+require("config.focus-mode")
+require("config.jumplist")
+require("config.lsp")
+require("config.windows")
 require("config.wpm")
 
+local project = require("config.project-local")
 project.set_project_colorscheme()

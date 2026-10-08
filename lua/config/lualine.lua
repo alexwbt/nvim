@@ -55,13 +55,4 @@ local function apply_state()
   end
 end
 
-local function toggle()
-  vim.g.lualine_hidden = not (vim.g.lualine_hidden or false)
-  apply_state()
-end
-
-vim.api.nvim_create_user_command("LualineToggle", toggle, { desc = "Toggle lualine statusline hidden/visible" })
-
-vim.api.nvim_create_user_command("LT", toggle, { desc = "Toggle lualine statusline hidden/visible (alias of LualineToggle)" })
-
 return { apply_state = apply_state }
