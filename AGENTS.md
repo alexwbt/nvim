@@ -87,7 +87,7 @@ So on Windows, `:!cmd`, terminal jobs, conform formatters, and LSP spawns inheri
 
 Configured in `lua/config/lsp/clients/*.lua` via `vim.lsp.config` + `vim.lsp.enable`, required from `config/lsp/init.lua`:
 
-- `clangd` — `c`/`cpp`, `root_markers = {'.git','.clangd'}`.
+- `clangd` — `c`/`cpp`, `root_markers = {'.git','.clangd'}`. NOT mason-managed — install the `clangd` binary yourself via your system package manager (see the mason-tool-installer section).
 - `lua_ls` — `lua`, `root_markers = {'.git','.luarc.json'}`, `vim` declared as a global.
 - `rust_analyzer` — `rust`, `root_markers = {Cargo.toml, rust-project.json, .git}`. NOT mason-managed: the binary comes from **rustup** (`~/.cargo/bin`), so it stays matched to the installed toolchain (mason would prepend a shadowing copy). `rustfmt` likewise ships with rustup. Requires `rustup component add rust-analyzer` — rustup's `default` profile omits it, and the `~/.cargo/bin` proxy still exists without it (errors at runtime with "Unknown binary 'rust-analyzer.exe'").
 - `ts_ls` — JS/TS, `root_markers = {tsconfig.json, jsconfig.json, package.json, .git}`; on Windows the binary is `typescript-language-server.cmd` (chosen via `jit.os`).
@@ -100,7 +100,7 @@ Configured in `lua/config/lsp/clients/*.lua` via `vim.lsp.config` + `vim.lsp.ena
 
 Two separate plugins, both `lazy = false`, both in `lua/plugins/mason.lua`:
 - `config.mason` only calls `require("mason").setup({})` — it does NOT hold `ensure_installed`.
-- `config.mason-tool-installer` calls `require("mason-tool-installer").setup({ ensure_installed = {...}, auto_update = false, run_on_start = true, start_delay = 3000 })` — this is the actual auto-installer. `ensure_installed`: `java-debug-adapter`, `java-test`, `clangd`, `lua-language-server`, `typescript-language-server`, `codebook`, `prettier`, `shfmt`, `tree-sitter-cli`.
+- `config.mason-tool-installer` calls `require("mason-tool-installer").setup({ ensure_installed = {...}, auto_update = false, run_on_start = true, start_delay = 3000 })` — this is the actual auto-installer. `ensure_installed`: `java-debug-adapter`, `java-test`, `lua-language-server`, `typescript-language-server`, `codebook`, `prettier`, `shfmt`, `tree-sitter-cli`. (`clangd` is NOT mason-managed — install it yourself, e.g. via your system package manager; see the `clangd` LSP entry.)
 
 mason prepends `<data>/mason/bin/` to `PATH` only within Neovim-spawned jobs (LSPs, conform, `:!`), so mason-managed binaries are invisible to a plain bash shell — available only to nvim. LSP servers are NOT wired through mason-lspconfig (config uses `vim.lsp.config`/`vim.lsp.enable`), so mason is only a source of tooling binaries. `:MasonInstall <pkg>` / `:MasonUpdate` manage them.
 

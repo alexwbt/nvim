@@ -16,7 +16,7 @@ repeated `vim.fn.has("win32")` calls.
 
 ## Manual setup (not automated)
 
-Most tooling (clangd, lua-language-server, typescript-language-server, codebook,
+Most tooling (lua-language-server, typescript-language-server, codebook,
 prettier, shfmt, tree-sitter-cli, java-debug/java-test bundles) is auto-installed
 by **mason-tool-installer** on first launch, and plugins/treesitter install via
 `:Lazy`/`:TSUpdate`. The following must be set up by hand:
@@ -39,6 +39,7 @@ LSP/formatter/linter/DAP tools, so these are not auto-installed:
 - `node` + `prettier` — prettier; `node` also runs typescript-language-server
 - `shfmt` — shell formatter
 - `clang-format` — C/C++ formatter
+- `clangd` — C/C++ LSP
 - `rg` — telescope/fzf-lua live grep
 - `fzf` — fzf-lua live grep (`<leader>fg`)
 - `zoxide` — `<leader>cd` (telescope-zoxide)
@@ -151,7 +152,7 @@ the **`nvim-jdtls`** plugin (`lua/plugins/jdtls.lua`).
 
 | Binary                             | Languages | Notes                                                                                                                                                                                                                                                                       |
 | ---------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `clangd`                           | C / C++   | mason-managed (`ensure_installed`)                                                                                                                                                                                                                                          |
+| `clangd`                           | C / C++   | NOT mason-managed — install the binary yourself (e.g. via your system package manager)                                                                                                                                                                                           |
 | `lua-language-server`              | Lua       | mason-managed (`ensure_installed`)                                                                                                                                                                                                                                          |
 | `rust-analyzer`                    | Rust      | provided by **rustup** (`~/.cargo/bin`), NOT mason-managed; see `lua/config/lsp/clients/rust.lua`                                                                                                                                                                                   |
 | `typescript-language-server[.cmd]` | JS / TS   | mason-managed; `.cmd` suffix on Windows; see `lua/config/lsp/clients/typescript.lua`                                                                                                                                                                                                |
@@ -162,7 +163,7 @@ the **`nvim-jdtls`** plugin (`lua/plugins/jdtls.lua`).
 | java-debug `/` java-test bundles   | Java      | installed via **mason-tool-installer** (`java-debug-adapter`, `java-test` → `<data>/mason/share`), or manually at `<jdtls-home>/java-debug` + `<jdtls-home>/vscode-java-test`, `stdpath('cache')/java-debug`, or `~/.debug-plugins` — enables Java DAP + JUnit test running |
 | `lemminx-maven` bundle (JVM)       | XML / `pom.xml` | NOT mason-managed; the mason `lemminx` binary is GraalVM-native and cannot load the extension. Prebuilt `lemminx-maven-<ver>-vscode-uber-jars.zip` launched via `java -cp` (manual install — see section 5); attaches to `pom.xml` only |
 
-mason-tool-installer auto-installs `clangd`/`lua-language-server`/`typescript-language-server`/`codebook`
+mason-tool-installer auto-installs `lua-language-server`/`typescript-language-server`/`codebook`
 on first launch (see the mason note below); they're then available to nvim only.
 Missing `jdtls`/`java` only warns on first `.java` open. Without the
 java-debug/vscode-java-test bundles the Java LSP still works, but Java DAP and
@@ -211,7 +212,7 @@ tests. See `lua/config/dap.lua`.
 `mason.nvim` (`lua/config/mason.lua`) only calls `setup({})` — it does NOT hold
 `ensure_installed`. The auto-install list lives in
 **mason-tool-installer.nvim** (`lua/config/mason-tool-installer.lua`, separate
-`lazy = false` plugin), which installs `clangd`, `lua-language-server`,
+`lazy = false` plugin), which installs `lua-language-server`,
 `typescript-language-server`, `codebook`, `prettier`, `shfmt`, `tree-sitter-cli`,
 and the `java-debug-adapter` / `java-test` bundles into `<data>/mason/` on startup
 (`run_on_start = true`, `start_delay = 3000`). mason prepends

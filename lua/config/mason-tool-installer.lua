@@ -11,7 +11,6 @@
 
 require("mason-tool-installer").setup({
   ensure_installed = {
-    "clangd",
     "codebook",
     "java-debug-adapter",
     "java-test",
