@@ -5,6 +5,7 @@ dictionaries = [
 words = [
     "autobuild",
     "breakpoint",
+    "bufnr",
     "clangd",
     "dapui",
     "esc",
