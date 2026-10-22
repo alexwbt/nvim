@@ -18,6 +18,7 @@ local widgets = require("dap.ui.widgets")
 local sessions_sidebar = widgets.sidebar(widgets.sessions)
 
 vim.fn.sign_define("DapBreakpoint", { text = "●", texthl = "ErrorMsg", linehl = "", numhl = "" })
+vim.fn.sign_define("DapBreakpointRejected", { text = "●", texthl = "Comment", linehl = "", numhl = "" })
 vim.fn.sign_define("DapBreakpointCondition", { text = "◆", texthl = "WarningMsg", linehl = "", numhl = "" })
 vim.fn.sign_define("DapStopped", { text = "▶", texthl = "Search", linehl = "Search", numhl = "Search" })
 
