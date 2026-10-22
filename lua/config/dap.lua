@@ -33,10 +33,14 @@ vim.keymap.set("n", "<F17>", dap.terminate, { desc = "DAP terminate" })
 vim.keymap.set("n", "<leader>dr", dap.repl.open, { desc = "DAP REPL" })
 vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "DAP UI" })
 vim.keymap.set("n", "<leader>ds", sessions_sidebar.toggle, { desc = "DAP sessions sidebar" })
-vim.api.nvim_create_user_command("ClearBreakpoints", dap.clear_breakpoints, { desc = "DAP clear breakpoints" })
 vim.keymap.set("n", "<Leader>bc", function()
   dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
 end, { desc = "DAP: Set Conditional Breakpoint" })
+
+vim.api.nvim_create_user_command("ClearBreakpoints", dap.clear_breakpoints, { desc = "DAP clear breakpoints" })
+vim.api.nvim_create_user_command("DapLog", function()
+  vim.cmd.tabnew(vim.fn.stdpath("log") .. "/dap.log")
+end, {})
 
 dap.listeners.after.event_initialized["dapui"] = function() dapui.open() end
 
