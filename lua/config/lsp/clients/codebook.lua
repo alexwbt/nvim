@@ -32,6 +32,14 @@ local function current_words(bufnr)
   return vim.tbl_keys(words)
 end
 
+vim.api.nvim_create_user_command("CodebookAdd", function(opts)
+  local bufnr = vim.api.nvim_get_current_buf()
+  local client = vim.lsp.get_clients({ name = "codebook", bufnr = bufnr })[1]
+  for _, arg in ipairs(opts.fargs) do
+    add_word(arg, client)
+  end
+end, { nargs = "+", desc = "Add words to the local codebook dictionary" })
+
 vim.api.nvim_create_user_command("CodebookAddAll", function()
   local bufnr = vim.api.nvim_get_current_buf()
   local client = vim.lsp.get_clients({ name = "codebook", bufnr = bufnr })[1]
