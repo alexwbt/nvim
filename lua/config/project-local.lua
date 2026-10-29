@@ -102,14 +102,14 @@ local function set_project_colorscheme()
 
   if has_root_markers(cpp_root_makers) then
     vim.cmd("colorscheme vscpp")
+  elseif has_root_markers(rust_root_markers) then
+    vim.cmd("colorscheme vscpp")
   elseif has_root_markers(js_root_markers) then
+    vim.cmd("colorscheme vscode")
+  elseif has_root_markers(python_root_markers) then
     vim.cmd("colorscheme vscode")
   elseif has_root_markers(java_root_markers) then
     vim.cmd("colorscheme jb")
-  elseif has_root_markers(python_root_markers) then
-    vim.cmd("colorscheme vscode")
-  elseif has_root_markers(rust_root_markers) then
-    vim.cmd("colorscheme vscode")
   else
     vim.cmd("colorscheme kanagawa-dragon")
   end
