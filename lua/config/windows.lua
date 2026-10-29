@@ -1,5 +1,6 @@
 if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
   vim.g.is_windows = true
+  vim.env.CC = "gcc"
   vim.opt.shell = "bash"
   vim.opt.shellcmdflag = "-c"
   vim.opt.shellquote = ""

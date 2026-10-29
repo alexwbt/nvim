@@ -3,6 +3,7 @@ require("config.lsp.clients.codebook")
 require("config.lsp.clients.jdtls")
 require("config.lsp.clients.lemminx")
 require("config.lsp.clients.lua")
+require("config.lsp.clients.python")
 require("config.lsp.clients.rust")
 require("config.lsp.clients.typescript")
 

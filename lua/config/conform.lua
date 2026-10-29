@@ -23,6 +23,8 @@ require("conform").setup({
     glsl = { "clang-format" },
     -- rustfmt
     rust = { "rustfmt" },
+    -- ruff
+    python = { "ruff_format", "ruff_organize_imports" },
   },
 })
 
