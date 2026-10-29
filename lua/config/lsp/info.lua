@@ -93,10 +93,27 @@ vim.api.nvim_create_user_command("LspInfo", function()
     return list
   end
 
+  -- Derive a set of search terms from the client's binary name. Node-based servers
+  -- (.cmd shims like pyright-langserver.cmd) launch `node <pkg>/.../x.js`, so the
+  -- OS process is node.exe and the cmdline drops the binary's `-langserver`/
+  -- `-language-server`/`-lsp` suffix (pyright-langserver.cmd -> ...\pyright\...).
+  -- Trying the stripped stem too lets us match those. Ordered longest-first so the
+  -- more specific full name wins scoring.
+  local function match_terms(cmd)
+    local base = (cmd:match("([^/\\]+)$") or ""):gsub("%.cmd$", ""):gsub("%.bat$", ""):lower()
+    local terms = { base }
+    for _, suffix in ipairs({ "%-langserver$", "%-language%-server$", "%-lsp$", "%-server$" }) do
+      local t = base:gsub(suffix, "")
+      if t ~= base and #t > 0 then
+        terms[#terms + 1] = t
+      end
+    end
+    return terms
+  end
+
   local function get_proc(client, used)
     local cmd = get_bin(client)
-    -- Base search term: basename without a launcher extension (.cmd/.bat)
-    local term = cmd:match("([^/\\]+)$"):gsub("%.cmd$", ""):gsub("%.bat$", ""):lower()
+    local terms = match_terms(cmd)
     local sig = client_sig(client):lower():gsub("\\", "/")
 
     local best, best_score
@@ -104,13 +121,23 @@ vim.api.nvim_create_user_command("LspInfo", function()
       -- Skip processes already claimed by another client so two instances of the
       -- same server get distinct pids instead of both reporting the first match.
       if not used[p.pid] and not is_wrapper(p.name) then
-        local name_match = vim.fn.fnamemodify(p.name, ":t"):lower() == term
+        local name_match = vim.fn.fnamemodify(p.name, ":t"):lower() == terms[1]
         -- Normalize separators so a client cmd's `/` matches the OS cmdline's `\`.
         local cmdline = p.cmdline:lower():gsub("\\", "/")
-        local cmd_match = cmdline:find(term, 1, true) ~= nil
+        -- Match if any term (full name or stripped stem) appears in the cmdline.
+        local longest_match = -1
+        for i, t in ipairs(terms) do
+          if cmdline:find(t, 1, true) then
+            longest_match = i
+            break
+          end
+        end
+        local cmd_match = longest_match ~= -1
         if name_match or cmd_match then
           local score = 0
           if name_match then score = score + 1 end
+          -- Longer/more specific term match ranks higher (full name beats stem).
+          if cmd_match then score = score + (#terms - longest_match + 1) end
           -- Prefer the process whose cmdline carries this client's unique args.
           if sig ~= "" and cmdline:find(sig, 1, true) then score = score + 2 end
           if not best or score > best_score or (score == best_score and p.wss > best.wss) then

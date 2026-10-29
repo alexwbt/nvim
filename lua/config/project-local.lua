@@ -24,6 +24,17 @@ local java_root_markers = {
   "mvnw",
   "mvnw.cmd",
 }
+local python_root_markers = {
+  "pyproject.toml",
+  "setup.py",
+  "setup.cfg",
+  "requirements.txt",
+  "Pipfile",
+}
+local rust_root_markers = {
+  "Cargo.toml",
+  "rust-project.json",
+}
 
 local function find_project_root()
   local dir     = vim.fn.getcwd()
@@ -31,7 +42,9 @@ local function find_project_root()
     root_markers,
     cpp_root_makers,
     js_root_markers,
-    java_root_markers
+    java_root_markers,
+    python_root_markers,
+    rust_root_markers,
   }
   markers       = vim.iter(markers):flatten():totable()
   for _ = 1, 20 do
@@ -93,6 +106,10 @@ local function set_project_colorscheme()
     vim.cmd("colorscheme vscode")
   elseif has_root_markers(java_root_markers) then
     vim.cmd("colorscheme jb")
+  elseif has_root_markers(python_root_markers) then
+    vim.cmd("colorscheme vscode")
+  elseif has_root_markers(rust_root_markers) then
+    vim.cmd("colorscheme vscode")
   else
     vim.cmd("colorscheme kanagawa-dragon")
   end
