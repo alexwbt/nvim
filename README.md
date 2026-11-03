@@ -44,7 +44,6 @@ LSP/formatter/linter/DAP tools, so these are not auto-installed:
 - `fzf` — fzf-lua live grep (`<leader>fg`)
 - `zoxide` — `<leader>cd` (telescope-zoxide)
 - `gdb` — C/C++ DAP
-- `curl` — minuet LLM HTTP requests
 - `rustup` — Rust toolchain manager; provides `cargo`, `rust-analyzer` and
   `rustfmt` in `~/.cargo/bin` (see https://rustup.rs). Not mason-managed so the
   server stays matched to your toolchain. rustup's `default` profile installs
@@ -52,14 +51,7 @@ LSP/formatter/linter/DAP tools, so these are not auto-installed:
   once. (The `~/.cargo/bin/rust-analyzer` proxy exists even without the component
   and errors at runtime with "Unknown binary 'rust-analyzer.exe'".)
 
-### 3. minuet LLM API key
-
-`minuet` (AI completion) reads its config from `stdpath('data')/minuet.json`
-(`:MinuetConfig` writes a starter template on first run). You must add the
-`api_key` (literal key) or `api_key_env` (env var name). This is the one secret
-that must come from you — it cannot be auto-installed.
-
-### 4. Java (only if you work with Java)
+### 3. Java (only if you work with Java)
 
 - **Java >= 21 runtime** — via `$JAVA_HOME` or `java` on PATH.
 - **jdtls install** — place at `$JDTLS_HOME`, or a `jdtls`/`jdtls.bat` shim
@@ -71,7 +63,7 @@ that must come from you — it cannot be auto-installed.
 The java-debug/java-test bundles for DAP + test running **are** auto-installed by
 mason; without them the Java LSP still works but debugging/tests are disabled.
 
-### 5. Maven `pom.xml` support (optional, needs Java)
+### 4. Maven `pom.xml` support (optional, needs Java)
 
 Go-to-definition on `<parent>`/GAV/properties in `pom.xml` (e.g. jump to the
 `spring-boot-starter-parent` POM in `~/.m2`) comes from the **JVM** lemminx +
@@ -119,7 +111,7 @@ module `<relativePath>` entries (Maven uses the explicit `relativePath`, so the
 filename is free). Non-POM XML like `.pom/checkstyle.xml` is intentionally left to
 other tooling (its Checkstyle DTD is not validated by the Maven server).
 
-### 6. First-launch steps in nvim
+### 5. First-launch steps in nvim
 
 1. `:Lazy` → wait for installs to finish.
 2. `:TSUpdate` → install + compile treesitter parsers.
@@ -146,8 +138,8 @@ editing.
 
 ### LSP servers
 
-Configured in `lua/config/lsp/clients/*.lua`. `clangd`, `lua_ls`, `rust_analyzer`, `ts_ls`
-and `lemminx-maven` use `vim.lsp.config` + `vim.lsp.enable`; `jdtls` is started by
+Configured in `lua/config/lsp/clients/*.lua`. `clangd`, `lua_ls`, `rust_analyzer`, `pyright`,
+`ts_ls` and `lemminx-maven` use `vim.lsp.config` + `vim.lsp.enable`; `jdtls` is started by
 the **`nvim-jdtls`** plugin (`lua/plugins/jdtls.lua`).
 
 | Binary                             | Languages | Notes                                                                                                                                                                                                                                                                       |
@@ -155,6 +147,7 @@ the **`nvim-jdtls`** plugin (`lua/plugins/jdtls.lua`).
 | `clangd`                           | C / C++   | NOT mason-managed — install the binary yourself (e.g. via your system package manager)                                                                                                                                                                                           |
 | `lua-language-server`              | Lua       | mason-managed (`ensure_installed`)                                                                                                                                                                                                                                          |
 | `rust-analyzer`                    | Rust      | provided by **rustup** (`~/.cargo/bin`), NOT mason-managed; see `lua/config/lsp/clients/rust.lua`                                                                                                                                                                                   |
+| `pyright`                         | Python    | mason-managed (`pyright` in `ensure_installed`); `typeCheckingMode = "basic"`; see `lua/config/lsp/clients/python.lua`                                                                                                                                                                    |
 | `typescript-language-server[.cmd]` | JS / TS   | mason-managed; `.cmd` suffix on Windows; see `lua/config/lsp/clients/typescript.lua`                                                                                                                                                                                                |
 | `codebook-lsp[.cmd]`               | all       | spell checker for code; mason-managed (`codebook`); `.cmd` suffix on Windows; see `lua/config/lsp/clients/codebook.lua`                                                                                                                                                              |
 | `java` (>= 21) or `$JAVA_HOME`     | Java      | jdtls launcher (via nvim-jdtls); deferred — only starts on first `.java` file open                                                                                                                                                                                          |
@@ -163,7 +156,7 @@ the **`nvim-jdtls`** plugin (`lua/plugins/jdtls.lua`).
 | java-debug `/` java-test bundles   | Java      | installed via **mason-tool-installer** (`java-debug-adapter`, `java-test` → `<data>/mason/share`), or manually at `<jdtls-home>/java-debug` + `<jdtls-home>/vscode-java-test`, `stdpath('cache')/java-debug`, or `~/.debug-plugins` — enables Java DAP + JUnit test running |
 | `lemminx-maven` bundle (JVM)       | XML / `pom.xml` | NOT mason-managed; the mason `lemminx` binary is GraalVM-native and cannot load the extension. Prebuilt `lemminx-maven-<ver>-vscode-uber-jars.zip` launched via `java -cp` (manual install — see section 5); attaches to `pom.xml` only |
 
-mason-tool-installer auto-installs `lua-language-server`/`typescript-language-server`/`codebook`
+mason-tool-installer auto-installs `lua-language-server`/`typescript-language-server`/`pyright`/`codebook`
 on first launch (see the mason note below); they're then available to nvim only.
 Missing `jdtls`/`java` only warns on first `.java` open. Without the
 java-debug/vscode-java-test bundles the Java LSP still works, but Java DAP and
@@ -180,8 +173,9 @@ Configured in `lua/config/conform.lua`. Triggered by `<leader>F` in normal mode.
 | `shfmt`        | sh, bash, zsh                                                  |
 | `clang-format` | c, cpp, glsl                                                   |
 | `rustfmt`      | rust                                                           |
+| `ruff`         | python (`ruff_format` + `ruff_organize_imports`)               |
 
-`prettier` and `shfmt` are mason-tool-installer-managed (`ensure_installed`).
+`prettier`, `shfmt` and `ruff` are mason-tool-installer-managed (`ensure_installed`).
 `prettier` implies `node` on PATH. `clang-format` is **not** mason-managed — it
 must be on the PATH (from the clang toolchain); for C/C++ `<leader>F` shells out to
 the `clang-format` binary rather than clangd's built-in formatter. `rustfmt` is
@@ -202,7 +196,7 @@ tests. See `lua/config/dap.lua`.
 
 | Binary   | Why                                       |
 | -------- | ----------------------------------------- |
-| `node`   | prettier + typescript-language-server     |
+| `node`   | prettier + typescript-language-server + pyright     |
 | `rg`     | telescope `live_grep`/`grep_string` + fzf-lua `live_grep` (reused, not re-spawned by fzf-lua) |
 | `fzf`    | fzf-lua `live_grep` (`<leader>fg`); NOT a mason package — install it with your system package manager |
 | `zoxide` | `<leader>cd` (telescope-zoxide extension) |
@@ -213,8 +207,8 @@ tests. See `lua/config/dap.lua`.
 `ensure_installed`. The auto-install list lives in
 **mason-tool-installer.nvim** (`lua/config/mason-tool-installer.lua`, separate
 `lazy = false` plugin), which installs `lua-language-server`,
-`typescript-language-server`, `codebook`, `prettier`, `shfmt`, `tree-sitter-cli`,
-and the `java-debug-adapter` / `java-test` bundles into `<data>/mason/` on startup
+`typescript-language-server`, `codebook`, `prettier`, `pyright`, `shfmt`, `tree-sitter-cli`,
+`ruff`, and the `java-debug-adapter` / `java-test` bundles into `<data>/mason/` on startup
 (`run_on_start = true`, `start_delay = 3000`). mason prepends
 `<data>/mason/bin/` to `PATH` only inside Neovim-spawned jobs (LSPs, conform,
 `:!`), so these binaries are available to nvim but **not** to a plain
