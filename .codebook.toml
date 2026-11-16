@@ -31,6 +31,8 @@ words = [
     "pnpm",
     "pom",
     "rnu",
+    "rustfmt",
+    "shfmt",
     "stdpath",
     "vscode",
     "vscpp",

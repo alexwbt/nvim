@@ -1,4 +1,3 @@
-
 require("conform").setup({
   formatters_by_ft = {
     -- prettier
@@ -25,6 +24,8 @@ require("conform").setup({
     rust = { "rustfmt" },
     -- ruff
     python = { "ruff_format", "ruff_organize_imports" },
+    -- sql-formatter
+    sql = { "sql_formatter" },
   },
 })
 
